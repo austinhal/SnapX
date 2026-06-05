@@ -1,0 +1,58 @@
+#region License Information (GPL v3)
+
+/*
+    ShareX - A program that allows you to take screenshots and share any file type
+    Copyright (c) 2007-2025 ShareX Team
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    Optionally you can also view the license at <http://www.gnu.org/licenses/>.
+*/
+
+#endregion License Information (GPL v3)
+
+using ShareX.HelpersLib;
+using System;
+
+namespace ShareX.MediaLib
+{
+    public static class FFmpegDownloader
+    {
+        // DownloadFFmpeg via DownloaderForm is Windows-only UI — not supported on macOS.
+        // Use Homebrew: brew install ffmpeg
+
+        public static bool ExtractFFmpeg(string archivePath, string extractPath)
+        {
+            try
+            {
+                ZipManager.Extract(archivePath, extractPath, false, entry => entry.Name.Equals("ffmpeg", StringComparison.OrdinalIgnoreCase), 1_000_000_000);
+                return true;
+            }
+            catch (Exception e)
+            {
+                DebugHelper.WriteException(e);
+            }
+
+            return false;
+        }
+
+        public static string GetFFmpegPath()
+        {
+            string bundled = System.IO.Path.Combine(AppContext.BaseDirectory, "ffmpeg");
+            if (System.IO.File.Exists(bundled)) return bundled;
+            return "/opt/homebrew/bin/ffmpeg";
+        }
+    }
+}
