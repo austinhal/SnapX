@@ -5,4 +5,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ShareXMac.HelpersLib\ShareXMac.HelpersLib.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>ShareXMac.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

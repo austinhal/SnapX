@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ShareXMac\ShareXMac.csproj" />
+    <ProjectReference Include="..\ShareXMac.ScreenCaptureLib\ShareXMac.ScreenCaptureLib.csproj" />
   </ItemGroup>
 </Project>
