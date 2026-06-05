@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ShareXMac.ViewModels"
+        xmlns:history="using:ShareX.HistoryLib"
+        x:Class="ShareXMac.Views.HistoryWindow"
+        x:DataType="vm:HistoryViewModel"
+        Width="700" Height="450"
+        WindowStartupLocation="CenterScreen"
+        Title="ShareX Mac — History">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <TextBox Grid.Row="0" Text="{Binding SearchText}"
+                 Watermark="Search by filename or URL…"
+                 Margin="8,8,8,4" />
+
+        <ListBox Grid.Row="1"
+                 ItemsSource="{Binding FilteredItems}"
+                 SelectedItem="{Binding SelectedItem}"
+                 Margin="8,4">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="history:HistoryItem">
+                    <Grid ColumnDefinitions="140,*,180" Margin="4,2">
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding DateTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                   VerticalAlignment="Center" FontSize="12" />
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding FileName}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding URL}"
+                                   VerticalAlignment="Center"
+                                   FontSize="11"
+                                   Foreground="#FF0078D4"
+                                   TextTrimming="CharacterEllipsis" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="8" Spacing="8">
+            <Button Content="Open in Finder"
+                    Command="{Binding OpenSelectedCommand}"
+                    Padding="12,6" />
+            <Button Content="Close"
+                    Command="{Binding CloseCommand}"
+                    Padding="12,6" />
+        </StackPanel>
+    </Grid>
+</Window>
