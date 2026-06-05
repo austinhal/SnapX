@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace ShareXMac.ViewModels;
 
-public partial class PostCaptureViewModel : ObservableObject
+public partial class PostCaptureViewModel : ObservableObject, IDisposable
 {
     public string FilePath { get; }
     public Bitmap Thumbnail { get; }
@@ -21,7 +21,7 @@ public partial class PostCaptureViewModel : ObservableObject
         FilePath = result.FilePath;
         _imageData = result.ImageData;
         using var ms = new MemoryStream(result.ImageData);
-        Thumbnail = new Bitmap(ms);
+        Thumbnail = Bitmap.DecodeToWidth(ms, 360);
     }
 
     [RelayCommand]
@@ -32,9 +32,11 @@ public partial class PostCaptureViewModel : ObservableObject
 
     [RelayCommand]
     private void OpenInFinder() =>
-        Process.Start(new ProcessStartInfo("open", $"-R \"{FilePath}\"")
-            { UseShellExecute = false });
+        Process.Start(new ProcessStartInfo("open")
+            { UseShellExecute = false, ArgumentList = { "-R", FilePath } });
 
     [RelayCommand]
     private void Dismiss() => CloseRequested?.Invoke();
+
+    public void Dispose() => Thumbnail.Dispose();
 }

@@ -59,8 +59,8 @@ public partial class HistoryViewModel : ObservableObject
     private void OpenSelected()
     {
         if (SelectedItem?.FilePath is { } path && File.Exists(path))
-            Process.Start(new ProcessStartInfo("open", $"-R \"{path}\"")
-                { UseShellExecute = false });
+            Process.Start(new ProcessStartInfo("open")
+                { UseShellExecute = false, ArgumentList = { "-R", path } });
     }
 
     [RelayCommand]

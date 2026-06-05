@@ -18,8 +18,16 @@ public partial class PostCaptureWindow : Window
         DataContext = vm;
         vm.CloseRequested += Close;
         this.Loaded += (_, _) => PositionBottomRight();
-        _ = Task.Delay(TimeSpan.FromSeconds(vm.AutoDismissSeconds))
-                .ContinueWith(_ => Avalonia.Threading.Dispatcher.UIThread.Post(Close));
+
+        var cts = new CancellationTokenSource();
+        this.Closed += (_, _) => cts.Cancel();
+        this.Closed += (_, _) => (DataContext as IDisposable)?.Dispose();
+        _ = Task.Delay(TimeSpan.FromSeconds(vm.AutoDismissSeconds), cts.Token)
+                .ContinueWith(t =>
+                {
+                    if (!t.IsCanceled)
+                        Avalonia.Threading.Dispatcher.UIThread.Post(Close);
+                }, TaskScheduler.Default);
     }
 
     private void PositionBottomRight()
