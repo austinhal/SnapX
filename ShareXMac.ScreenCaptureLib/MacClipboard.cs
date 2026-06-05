@@ -50,6 +50,7 @@ public static class MacClipboard
             nint pb = GetGeneralPasteboard();
             nint typeStr = ObjCRuntime.ToNSString(NSPasteboardTypeString);
             nint result = ObjCRuntime.Send(pb, "stringForType:", typeStr);
+            ObjCRuntime.Send(typeStr, "release");
             return ObjCRuntime.ToManagedString(result);
         }
         finally { DrainPool(pool); }
@@ -65,6 +66,7 @@ public static class MacClipboard
             nint typeStr = ObjCRuntime.ToNSString(NSPasteboardTypeString);
             nint types = ObjCRuntime.ArrayWithObject(typeStr);
             nint available = ObjCRuntime.Send(pb, "availableTypeFromArray:", types);
+            ObjCRuntime.Send(typeStr, "release");
             return available != 0;
         }
         finally { DrainPool(pool); }
@@ -80,6 +82,7 @@ public static class MacClipboard
             nint typeStr = ObjCRuntime.ToNSString(NSPasteboardTypePNG);
             nint types = ObjCRuntime.ArrayWithObject(typeStr);
             nint available = ObjCRuntime.Send(pb, "availableTypeFromArray:", types);
+            ObjCRuntime.Send(typeStr, "release");
             return available != 0;
         }
         finally { DrainPool(pool); }
@@ -108,15 +111,14 @@ public static class MacClipboard
                     ObjCRuntime.Sel("initWithBytes:length:"),
                     (nint)ptr, (nuint)png.Length);
             }
-            nint nsImage = ObjCRuntime.Send(
-                ObjCRuntime.Send(ObjCRuntime.GetClass("NSImage"), "alloc"),
-                "initWithData:", nsData);
-            ObjCRuntime.Send(nsData, "release");
-            if (nsImage == 0) return;
             nint pb = GetGeneralPasteboard();
             ObjCRuntime.Send(pb, "clearContents");
-            ObjCRuntime.Send(pb, "writeObjects:", ObjCRuntime.ArrayWithObject(nsImage));
-            ObjCRuntime.Send(nsImage, "release");
+            nint typeStr = ObjCRuntime.ToNSString(NSPasteboardTypePNG);
+            nint types = ObjCRuntime.ArrayWithObject(typeStr);
+            ObjCRuntime.Send(pb, "declareTypes:owner:", types, 0);
+            ObjCRuntime.Send(pb, "setData:forType:", nsData, typeStr);
+            ObjCRuntime.Send(typeStr, "release");
+            ObjCRuntime.Send(nsData, "release");
         }
         finally { DrainPool(pool); }
     }
