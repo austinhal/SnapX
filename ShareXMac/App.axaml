@@ -4,4 +4,34 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/icon.ico" ToolTipText="ShareX Mac">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Capture Region"
+                                        Command="{Binding CaptureRegionCommand}" />
+                        <NativeMenuItem Header="Capture Window"
+                                        Command="{Binding CaptureWindowCommand}" />
+                        <NativeMenuItem Header="Capture Fullscreen"
+                                        Command="{Binding CaptureFullscreenCommand}" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Record Video"
+                                        Command="{Binding RecordVideoCommand}" />
+                        <NativeMenuItem Header="Record GIF"
+                                        Command="{Binding RecordGifCommand}" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Settings..."
+                                        Command="{Binding OpenSettingsCommand}" />
+                        <NativeMenuItem Header="History..."
+                                        Command="{Binding OpenHistoryCommand}" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Quit"
+                                        Command="{Binding QuitCommand}" />
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
 </Application>
