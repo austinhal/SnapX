@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ShareXMac.ViewModels"
+        x:Class="ShareXMac.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Width="480" Height="320"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Title="ShareX Mac — Settings">
+    <StackPanel Margin="20" Spacing="14">
+        <TextBlock Text="Save Location" FontWeight="SemiBold" />
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBox Grid.Column="0" Text="{Binding SavePath}"
+                     Watermark="/Users/you/Pictures/ShareX Mac" />
+            <Button Grid.Column="1" Content="Browse…"
+                    Command="{Binding BrowseCommand}"
+                    CommandParameter="{Binding $parent[Window]}"
+                    Margin="8,0,0,0" Padding="12,6" />
+        </Grid>
+
+        <Separator />
+
+        <CheckBox Content="Copy image to clipboard after capture"
+                  IsChecked="{Binding AutoCopyImage}" />
+        <CheckBox Content="Show post-capture toolbar"
+                  IsChecked="{Binding ShowPostCaptureToolbar}" />
+
+        <Grid ColumnDefinitions="Auto,*">
+            <TextBlock Grid.Column="0" Text="Toolbar timeout (seconds):"
+                       VerticalAlignment="Center" Margin="0,0,8,0" />
+            <NumericUpDown Grid.Column="1" Value="{Binding PostCaptureTimeoutSeconds}"
+                           Minimum="2" Maximum="60" Width="80" HorizontalAlignment="Left" />
+        </Grid>
+
+        <Separator />
+
+        <Button Content="Save" Command="{Binding SaveCommand}"
+                HorizontalAlignment="Right" Background="#FF0078D4"
+                Foreground="White" Padding="16,8" />
+    </StackPanel>
+</Window>
