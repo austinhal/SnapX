@@ -1,3 +1,4 @@
+using ShareX.HelpersLib;
 using ShareXMac.Platform;
 using Xunit;
 

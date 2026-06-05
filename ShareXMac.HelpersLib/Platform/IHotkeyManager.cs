@@ -1,4 +1,4 @@
-namespace ShareXMac.Platform;
+namespace ShareX.HelpersLib;
 
 public interface IHotkeyManager
 {

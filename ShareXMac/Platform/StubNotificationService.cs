@@ -1,3 +1,4 @@
+using ShareX.HelpersLib;
 namespace ShareXMac.Platform;
 
 public class StubNotificationService : INotificationService
