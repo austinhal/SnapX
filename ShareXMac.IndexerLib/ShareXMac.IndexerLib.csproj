@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShareXMac.HelpersLib\ShareXMac.HelpersLib.csproj" />
+  </ItemGroup>
+</Project>

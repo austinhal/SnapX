@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShareXMac.HelpersLib\ShareXMac.HelpersLib.csproj" />
+    <ProjectReference Include="..\ShareXMac.UploadersLib\ShareXMac.UploadersLib.csproj" />
+    <ProjectReference Include="..\ShareXMac.ImageEffectsLib\ShareXMac.ImageEffectsLib.csproj" />
+    <ProjectReference Include="..\ShareXMac.HistoryLib\ShareXMac.HistoryLib.csproj" />
+    <ProjectReference Include="..\ShareXMac.IndexerLib\ShareXMac.IndexerLib.csproj" />
+    <ProjectReference Include="..\ShareXMac.MediaLib\ShareXMac.MediaLib.csproj" />
+    <ProjectReference Include="..\ShareXMac.ScreenCaptureLib\ShareXMac.ScreenCaptureLib.csproj" />
+  </ItemGroup>
+</Project>

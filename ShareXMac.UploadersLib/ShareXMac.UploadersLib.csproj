@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentFTP" Version="52.1.0" />
+    <PackageReference Include="MegaApiClient" Version="1.10.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SSH.NET" Version="2025.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShareXMac.HelpersLib\ShareXMac.HelpersLib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\OAuthCallbackPage.html" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
