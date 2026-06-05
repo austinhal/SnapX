@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using ShareXMac.ScreenCaptureLib;
+using ShareXMac.Services;
 using ShareXMac.ViewModels;
 
 namespace ShareXMac;
@@ -12,8 +13,16 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var capture = new MacScreenCapture();
-        DataContext = new TrayViewModel(capture);
+        string appSupport = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "ShareX-Mac");
+        Directory.CreateDirectory(appSupport);
+
+        var settings = new SettingsService(Path.Combine(appSupport, "settings.json"));
+        var history  = new HistoryService(Path.Combine(appSupport, "history.json"));
+        var capture  = new MacScreenCapture();
+
+        DataContext = new TrayViewModel(capture, settings, history);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnExplicitShutdown;
