@@ -170,11 +170,6 @@ namespace ShareX.HelpersLib
             graphicsPath.AddPolygon(points);
         }
 
-        public static void WindingModeOutline(this GraphicsPath graphicsPath)
-        {
-            IntPtr handle = (IntPtr)graphicsPath.GetType().GetField("nativePath", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(graphicsPath);
-            HandleRef path = new HandleRef(graphicsPath, handle);
-            NativeMethods.GdipWindingModeOutline(path, IntPtr.Zero, 0.25F);
-        }
+        // WindingModeOutline removed — uses Windows GDI+ NativeMethods not available on macOS
     }
 }

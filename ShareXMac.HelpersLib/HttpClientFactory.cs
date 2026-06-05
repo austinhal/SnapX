@@ -48,7 +48,7 @@ namespace ShareX.HelpersLib
                         };
 
                         client = new HttpClient(clientHandler);
-                        client.DefaultRequestHeaders.UserAgent.ParseAdd(ShareXResources.UserAgent);
+                        client.DefaultRequestHeaders.UserAgent.ParseAdd("ShareX-Mac/1.0");
                         client.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue()
                         {
                             NoCache = true

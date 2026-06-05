@@ -281,13 +281,8 @@ namespace ShareX.HelpersLib
             return Icon.FromHandle(handle);
         }
 
-        public static void DisposeHandle(this Icon icon)
-        {
-            if (icon.Handle != IntPtr.Zero)
-            {
-                NativeMethods.DestroyIcon(icon.Handle);
-            }
-        }
+        // DisposeHandle — NativeMethods.DestroyIcon not available on macOS; no-op stub
+        public static void DisposeHandle(this Icon icon) { }
 
         public static void ApplyDefaultPropertyValues(this object self)
         {
@@ -431,8 +426,9 @@ namespace ShareX.HelpersLib
 
         public static void ShowError(this Exception e, bool fullError = true)
         {
+            // MessageBox not available on macOS — log to debug instead
             string error = fullError ? e.ToString() : e.Message;
-            MessageBox.Show(error, "ShareX - " + Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            DebugHelper.WriteLine("Error: " + error);
         }
 
         public static Task ContinueInCurrentContext(this Task task, Action action)

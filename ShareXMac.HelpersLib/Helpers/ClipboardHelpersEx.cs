@@ -28,7 +28,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace ShareX.HelpersLib
 {
@@ -37,33 +36,11 @@ namespace ShareX.HelpersLib
         // Source: https://stackoverflow.com/a/46424800/264877
 
         /// <summary>
-        /// Copies the given image to the clipboard as PNG, DIB and standard Bitmap format.
+        /// macOS stub — WinForms DataObject not available on macOS.
         /// </summary>
-        /// <param name="image">Image to put on the clipboard.</param>
-        /// <param name="imageNoTr">Optional specifically nontransparent version of the image to put on the clipboard.</param>
-        /// <param name="data">Clipboard data object to put the image into. Might already contain other stuff. Leave null to create a new one.</param>
-        public static void SetClipboardImage(Bitmap image, Bitmap imageNoTr, DataObject data)
+        public static void SetClipboardImage(Bitmap image, Bitmap imageNoTr, object data)
         {
-            Clipboard.Clear();
-            if (data == null)
-                data = new DataObject();
-            if (imageNoTr == null)
-                imageNoTr = image;
-            using (MemoryStream pngMemStream = new MemoryStream())
-            using (MemoryStream dibMemStream = new MemoryStream())
-            {
-                // As standard bitmap, without transparency support
-                data.SetData(DataFormats.Bitmap, true, imageNoTr);
-                // As PNG. Gimp will prefer this over the other two.
-                image.Save(pngMemStream, ImageFormat.Png);
-                data.SetData("PNG", false, pngMemStream);
-                // As DIB. This is (wrongly) accepted as ARGB by many applications.
-                byte[] dibData = ConvertToDib(image);
-                dibMemStream.Write(dibData, 0, dibData.Length);
-                data.SetData(DataFormats.Dib, false, dibMemStream);
-                // The 'copy=true' argument means the MemoryStreams can be safely disposed after the operation.
-                Clipboard.SetDataObject(data, true);
-            }
+            // No-op stub — real implementation in Plan 2
         }
 
         /// <summary>
@@ -119,31 +96,9 @@ namespace ShareX.HelpersLib
         }
 
         /// <summary>
-        /// Retrieves an image from the given clipboard data object, in the order PNG, DIB, Bitmap, Image object.
+        /// macOS stub — WinForms DataObject not available on macOS.
         /// </summary>
-        /// <param name="retrievedData">The clipboard data.</param>
-        /// <returns>The extracted image, or null if no supported image type was found.</returns>
-        public static Bitmap GetClipboardImage(DataObject retrievedData)
-        {
-            Bitmap clipboardimage = null;
-            // Order: try PNG, move on to try 32-bit ARGB DIB, then try the normal Bitmap and Image types.
-            if (retrievedData.GetDataPresent("PNG", false) && retrievedData.GetData("PNG", false) is MemoryStream pngStream)
-            {
-                using (Bitmap bm = new Bitmap(pngStream))
-                {
-                    clipboardimage = CloneImage(bm);
-                }
-            }
-            if (clipboardimage == null && retrievedData.GetDataPresent(DataFormats.Dib, false) && retrievedData.GetData(DataFormats.Dib, false) is MemoryStream dib)
-            {
-                clipboardimage = ImageFromClipboardDib(dib.ToArray());
-            }
-            if (clipboardimage == null && retrievedData.GetDataPresent(DataFormats.Bitmap))
-                clipboardimage = new Bitmap(retrievedData.GetData(DataFormats.Bitmap) as Image);
-            if (clipboardimage == null && retrievedData.GetDataPresent(typeof(Image)))
-                clipboardimage = new Bitmap(retrievedData.GetData(typeof(Image)) as Image);
-            return clipboardimage;
-        }
+        public static Bitmap GetClipboardImage(object retrievedData) => null;
 
         public static Bitmap ImageFromClipboardDib(byte[] dibBytes)
         {
@@ -360,20 +315,7 @@ namespace ShareX.HelpersLib
             return targetImage;
         }
 
-        public static Bitmap DIBV5ToBitmap(byte[] data)
-        {
-            GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            BITMAPV5HEADER bmi = (BITMAPV5HEADER)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(BITMAPV5HEADER));
-            int stride = -(int)(bmi.bV5SizeImage / bmi.bV5Height);
-            long offset = bmi.bV5Size + ((bmi.bV5Height - 1) * (int)(bmi.bV5SizeImage / bmi.bV5Height));
-            if (bmi.bV5Compression == (uint)BitmapCompressionMode.BI_BITFIELDS)
-            {
-                offset += 12;
-            }
-            IntPtr scan0 = new IntPtr(handle.AddrOfPinnedObject().ToInt64() + offset);
-            Bitmap bitmap = new Bitmap(bmi.bV5Width, bmi.bV5Height, stride, PixelFormat.Format32bppPArgb, scan0);
-            handle.Free();
-            return bitmap;
-        }
+        // DIBV5ToBitmap — uses Windows native BITMAPV5HEADER; not supported on macOS
+        public static Bitmap DIBV5ToBitmap(byte[] data) => null;
     }
 }

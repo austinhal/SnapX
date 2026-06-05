@@ -33,8 +33,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
-using System.Windows.Media.Imaging;
 
 namespace ShareX.HelpersLib
 {
@@ -83,34 +81,10 @@ namespace ShareX.HelpersLib
 
         public static Bitmap ScaleImageFast(Bitmap bmp, double scaleX, double scaleY)
         {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                bmp.Save(memoryStream, ImageFormat.Bmp);
-                memoryStream.Position = 0;
-
-                BitmapImage bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.StreamSource = memoryStream;
-                bitmapImage.EndInit();
-
-                TransformedBitmap transformedBitmap = new TransformedBitmap();
-                transformedBitmap.BeginInit();
-                transformedBitmap.Source = bitmapImage;
-                transformedBitmap.Transform = new System.Windows.Media.ScaleTransform(scaleX, scaleY);
-                transformedBitmap.EndInit();
-
-                return GetBitmap(transformedBitmap);
-            }
-        }
-
-        private static Bitmap GetBitmap(BitmapSource bitmapSource, PixelFormat pixelFormat = PixelFormat.Format32bppArgb)
-        {
-            Bitmap bmp = new Bitmap(bitmapSource.PixelWidth, bitmapSource.PixelHeight, pixelFormat);
-            BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, pixelFormat);
-            bitmapSource.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
-            bmp.UnlockBits(data);
-            return bmp;
+            // WPF BitmapImage not available on macOS — fall back to GDI+ ResizeImage
+            int newWidth = Math.Max(1, (int)(bmp.Width * scaleX));
+            int newHeight = Math.Max(1, (int)(bmp.Height * scaleY));
+            return ResizeImage(bmp, newWidth, newHeight);
         }
 
         public static Bitmap ResizeImage(Bitmap bmp, Size size, bool allowEnlarge, bool centerImage = true)
@@ -1042,12 +1016,18 @@ namespace ShareX.HelpersLib
         {
             if (bmp1 != null && bmp2 != null && bmp1.Width == bmp2.Width && bmp1.Height == bmp2.Height)
             {
+                // NativeMethods.memcmp not available on macOS — use managed byte comparison
                 BitmapData bd1 = bmp1.LockBits(new Rectangle(0, 0, bmp1.Width, bmp1.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                 BitmapData bd2 = bmp2.LockBits(new Rectangle(0, 0, bmp2.Width, bmp2.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
                 try
                 {
-                    return NativeMethods.memcmp(bd1.Scan0, bd2.Scan0, bd1.Stride * bmp1.Height) == 0;
+                    int len = bd1.Stride * bmp1.Height;
+                    byte[] a1 = new byte[len];
+                    byte[] a2 = new byte[len];
+                    System.Runtime.InteropServices.Marshal.Copy(bd1.Scan0, a1, 0, len);
+                    System.Runtime.InteropServices.Marshal.Copy(bd2.Scan0, a2, 0, len);
+                    return a1.AsSpan().SequenceEqual(a2.AsSpan());
                 }
                 finally
                 {
@@ -2111,40 +2091,9 @@ namespace ShareX.HelpersLib
             return bmpResult;
         }
 
-        public static string OpenImageFileDialog(Form form = null, string initialDirectory = null)
-        {
-            string[] images = OpenImageFileDialog(false, form, initialDirectory);
-
-            if (images != null && images.Length > 0)
-            {
-                return images[0];
-            }
-
-            return null;
-        }
-
-        public static string[] OpenImageFileDialog(bool multiselect, Form form = null, string initialDirectory = null)
-        {
-            using (OpenFileDialog ofd = new OpenFileDialog())
-            {
-                ofd.Filter = "Image files (*.png, *.jpg, *.jpeg, *.jpe, *.jfif, *.gif, *.bmp, *.tif, *.tiff)|*.png;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.bmp;*.tif;*.tiff|" +
-                    "PNG (*.png)|*.png|JPEG (*.jpg, *.jpeg, *.jpe, *.jfif)|*.jpg;*.jpeg;*.jpe;*.jfif|GIF (*.gif)|*.gif|BMP (*.bmp)|*.bmp|TIFF (*.tif, *.tiff)|*.tif;*.tiff";
-
-                ofd.Multiselect = multiselect;
-
-                if (!string.IsNullOrEmpty(initialDirectory))
-                {
-                    ofd.InitialDirectory = initialDirectory;
-                }
-
-                if (ofd.ShowDialog(form) == DialogResult.OK)
-                {
-                    return ofd.FileNames;
-                }
-            }
-
-            return null;
-        }
+        // OpenImageFileDialog — WinForms Form dialogs not available on macOS; stubs return null
+        public static string OpenImageFileDialog(string initialDirectory = null) => null;
+        public static string[] OpenImageFileDialog(bool multiselect, string initialDirectory = null) => null;
 
         public static ImageFormat GetImageFormat(string filePath)
         {
@@ -2198,74 +2147,8 @@ namespace ShareX.HelpersLib
             return false;
         }
 
-        public static string SaveImageFileDialog(Image img, string filePath = "", bool useLastDirectory = true)
-        {
-            using (SaveFileDialog sfd = new SaveFileDialog())
-            {
-                sfd.Filter = "PNG (*.png)|*.png|JPEG (*.jpg, *.jpeg, *.jpe, *.jfif)|*.jpg;*.jpeg;*.jpe;*.jfif|GIF (*.gif)|*.gif|BMP (*.bmp)|*.bmp|TIFF (*.tif, *.tiff)|*.tif;*.tiff";
-                sfd.DefaultExt = "png";
-
-                string initialDirectory = null;
-
-                if (useLastDirectory && !string.IsNullOrEmpty(HelpersOptions.LastSaveDirectory) && Directory.Exists(HelpersOptions.LastSaveDirectory))
-                {
-                    initialDirectory = HelpersOptions.LastSaveDirectory;
-                }
-
-                if (!string.IsNullOrEmpty(filePath))
-                {
-                    string folder = Path.GetDirectoryName(filePath);
-
-                    if (string.IsNullOrEmpty(initialDirectory) && !string.IsNullOrEmpty(folder) && Directory.Exists(folder))
-                    {
-                        initialDirectory = folder;
-                    }
-
-                    sfd.FileName = Path.GetFileName(filePath);
-
-                    string ext = FileHelpers.GetFileNameExtension(filePath);
-
-                    if (!string.IsNullOrEmpty(ext))
-                    {
-                        ext = ext.ToLowerInvariant();
-
-                        switch (ext)
-                        {
-                            case "png":
-                                sfd.FilterIndex = 1;
-                                break;
-                            case "jpg":
-                            case "jpeg":
-                            case "jpe":
-                            case "jfif":
-                                sfd.FilterIndex = 2;
-                                break;
-                            case "gif":
-                                sfd.FilterIndex = 3;
-                                break;
-                            case "bmp":
-                                sfd.FilterIndex = 4;
-                                break;
-                            case "tif":
-                            case "tiff":
-                                sfd.FilterIndex = 5;
-                                break;
-                        }
-                    }
-                }
-
-                sfd.InitialDirectory = initialDirectory;
-
-                if (sfd.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(sfd.FileName))
-                {
-                    SaveImage(img, sfd.FileName);
-                    HelpersOptions.LastSaveDirectory = Path.GetDirectoryName(sfd.FileName);
-                    return sfd.FileName;
-                }
-            }
-
-            return null;
-        }
+        // SaveImageFileDialog — WinForms SaveFileDialog not available on macOS; stub returns null
+        public static string SaveImageFileDialog(Image img, string filePath = "", bool useLastDirectory = true) => null;
 
         public static Bitmap LoadImage(string filePath)
         {
@@ -2297,17 +2180,8 @@ namespace ShareX.HelpersLib
             return null;
         }
 
-        public static Bitmap LoadImageWithFileDialog(Form form = null)
-        {
-            string filePath = OpenImageFileDialog(form);
-
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                return LoadImage(filePath);
-            }
-
-            return null;
-        }
+        // LoadImageWithFileDialog — WinForms Form dialogs not available on macOS
+        public static Bitmap LoadImageWithFileDialog() => null;
 
         public static Bitmap CombineImages(List<Bitmap> images, Orientation orientation, ImageCombinerAlignment alignment = ImageCombinerAlignment.LeftOrTop,
             int space = 0, int wrapAfter = 0, bool autoFillBackground = false)

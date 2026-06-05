@@ -23,7 +23,6 @@
 
 #endregion License Information (GPL v3)
 
-using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using ShareX.HelpersLib.Properties;
 using System;
@@ -33,7 +32,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Media;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Resources;
@@ -45,7 +43,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace ShareX.HelpersLib
@@ -63,26 +60,7 @@ namespace ShareX.HelpersLib
 
         public static readonly Version OSVersion = Environment.OSVersion.Version;
 
-        private static Cursor[] cursorList;
-
-        public static Cursor[] CursorList
-        {
-            get
-            {
-                if (cursorList == null)
-                {
-                    cursorList = new Cursor[] {
-                        Cursors.AppStarting, Cursors.Arrow, Cursors.Cross, Cursors.Default, Cursors.Hand, Cursors.Help,
-                        Cursors.HSplit, Cursors.IBeam, Cursors.No, Cursors.NoMove2D, Cursors.NoMoveHoriz, Cursors.NoMoveVert,
-                        Cursors.PanEast, Cursors.PanNE, Cursors.PanNorth, Cursors.PanNW, Cursors.PanSE, Cursors.PanSouth,
-                        Cursors.PanSW, Cursors.PanWest, Cursors.SizeAll, Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE,
-                        Cursors.SizeWE, Cursors.UpArrow, Cursors.VSplit, Cursors.WaitCursor
-                    };
-                }
-
-                return cursorList;
-            }
-        }
+        // CursorList removed — WinForms Cursor not available on macOS
 
         public static string AddZeroes(string input, int digits = 2)
         {
@@ -276,7 +254,8 @@ namespace ShareX.HelpersLib
 
         public static string GetApplicationVersion(bool includeRevision = false)
         {
-            Version version = Version.Parse(Application.ProductVersion);
+            var asm = System.Reflection.Assembly.GetEntryAssembly() ?? System.Reflection.Assembly.GetExecutingAssembly();
+            Version version = asm.GetName().Version ?? new Version(0, 0, 0);
             string result = $"{version.Major}.{version.Minor}.{version.Build}";
             if (includeRevision)
             {
@@ -373,8 +352,9 @@ namespace ShareX.HelpersLib
 
         public static bool IsDefaultInstallDir()
         {
+            // Application.ExecutablePath not available on macOS — use AppContext.BaseDirectory
             string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            return Application.ExecutablePath.StartsWith(path);
+            return AppContext.BaseDirectory.StartsWith(path);
         }
 
         public static bool IsValidIPAddress(string ip)
@@ -394,34 +374,9 @@ namespace ShareX.HelpersLib
             return time;
         }
 
-        public static void PlaySoundAsync(Stream stream)
-        {
-            if (stream != null)
-            {
-                Task.Run(() =>
-                {
-                    using (stream)
-                    using (SoundPlayer soundPlayer = new SoundPlayer(stream))
-                    {
-                        soundPlayer.PlaySync();
-                    }
-                });
-            }
-        }
-
-        public static void PlaySoundAsync(string filePath)
-        {
-            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
-            {
-                Task.Run(() =>
-                {
-                    using (SoundPlayer soundPlayer = new SoundPlayer(filePath))
-                    {
-                        soundPlayer.PlaySync();
-                    }
-                });
-            }
-        }
+        // PlaySoundAsync — SoundPlayer is Windows-only; stub no-ops on macOS
+        public static void PlaySoundAsync(Stream stream) { }
+        public static void PlaySoundAsync(string filePath) { }
 
         public static bool WaitWhile(Func<bool> check, int interval, int timeout = -1)
         {
@@ -655,39 +610,17 @@ namespace ShareX.HelpersLib
 
         public static string GetOperatingSystemProductName(bool includeBit = false)
         {
-            string productName = RegistryHelpers.GetValueString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", RegistryHive.LocalMachine);
-
-            if (string.IsNullOrEmpty(productName))
-            {
-                productName = Environment.OSVersion.VersionString;
-            }
-
+            // Registry not available on macOS — use RuntimeInformation
+            string productName = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
             if (includeBit)
             {
-                string bit;
-
-                if (Environment.Is64BitOperatingSystem)
-                {
-                    bit = "64";
-                }
-                else
-                {
-                    bit = "32";
-                }
-
+                string bit = Environment.Is64BitOperatingSystem ? "64" : "32";
                 productName = $"{productName} ({bit}-bit)";
             }
-
             return productName;
         }
 
-        public static Cursor CreateCursor(byte[] data)
-        {
-            using (MemoryStream ms = new MemoryStream(data))
-            {
-                return new Cursor(ms);
-            }
-        }
+        // CreateCursor removed — WinForms Cursor not available on macOS
 
         public static string EscapeCLIText(string text)
         {
@@ -816,22 +749,8 @@ namespace ShareX.HelpersLib
             return result;
         }
 
-        public static bool IsTabletMode()
-        {
-            //int state = NativeMethods.GetSystemMetrics(SystemMetric.SM_CONVERTIBLESLATEMODE);
-            //return state == 0;
-
-            try
-            {
-                int result = (int)Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ImmersiveShell", "TabletMode", 0);
-                return result > 0;
-            }
-            catch
-            {
-            }
-
-            return false;
-        }
+        // IsTabletMode — Registry not available on macOS; always false
+        public static bool IsTabletMode() => false;
 
         public static string JSONFormat(string json, Newtonsoft.Json.Formatting formatting)
         {
@@ -865,7 +784,7 @@ namespace ShareX.HelpersLib
         {
             percentage = percentage.Clamp(0, 100);
 
-            Size size = SystemInformation.SmallIconSize;
+            Size size = new Size(16, 16); // SystemInformation.SmallIconSize not available on macOS
 
             using (Bitmap bmp = new Bitmap(size.Width, size.Height))
             using (Graphics g = Graphics.FromImage(bmp))
@@ -965,11 +884,7 @@ namespace ShareX.HelpersLib
             return Task.WhenAll(tasks);
         }
 
-        public static void LockCursorToWindow(Form form)
-        {
-            form.Activated += (sender, e) => Cursor.Clip = form.Bounds;
-            form.Deactivate += (sender, e) => Cursor.Clip = Rectangle.Empty;
-        }
+        // LockCursorToWindow removed — WinForms Form/Cursor not available on macOS
 
         public static bool IsDefaultSettings<T>(IEnumerable<T> current, IEnumerable<T> source, Func<T, T, bool> predicate)
         {
@@ -981,14 +896,8 @@ namespace ShareX.HelpersLib
             return true;
         }
 
-        public static string GetDesktopWallpaperFilePath()
-        {
-            byte[] transcodedImageCache = (byte[])RegistryHelpers.GetValue(@"Control Panel\Desktop", "TranscodedImageCache");
-            byte[] transcodedImageCacheDest = new byte[transcodedImageCache.Length - 24];
-            Array.Copy(transcodedImageCache, 24, transcodedImageCacheDest, 0, transcodedImageCacheDest.Length);
-            string wallpaperFilePath = Encoding.Unicode.GetString(transcodedImageCacheDest);
-            return wallpaperFilePath.TrimEnd('\0');
-        }
+        // GetDesktopWallpaperFilePath — Registry not available on macOS; returns null
+        public static string GetDesktopWallpaperFilePath() => null;
 
         public static IEnumerable<int> Range(int from, int to, int increment = 1)
         {

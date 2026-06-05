@@ -67,12 +67,7 @@ namespace ShareX.HelpersLib
                         return mimeType;
                     }
 
-                    mimeType = RegistryHelpers.GetValueString(extension, "Content Type", RegistryHive.ClassesRoot);
-
-                    if (!string.IsNullOrEmpty(mimeType))
-                    {
-                        return mimeType;
-                    }
+                    // RegistryHelpers not available on macOS — skip registry MIME lookup
                 }
             }
 

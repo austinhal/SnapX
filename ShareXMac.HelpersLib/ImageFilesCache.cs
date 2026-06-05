@@ -66,18 +66,7 @@ namespace ShareX.HelpersLib
                     return images[filePath];
                 }
 
-                using (Icon icon = NativeMethods.GetFileIcon(filePath, isSmallIcon))
-                {
-                    if (icon != null && icon.Width > 0 && icon.Height > 0)
-                    {
-                        bmp = icon.ToBitmap();
-
-                        if (bmp != null)
-                        {
-                            images.Add(filePath, bmp);
-                        }
-                    }
-                }
+                // NativeMethods.GetFileIcon not available on macOS — skip file icon loading
             }
 
             return bmp;
