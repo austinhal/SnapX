@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ShareXMac.ViewModels"
+        x:Class="ShareXMac.Views.PostCaptureWindow"
+        Width="360" Height="240"
+        MinWidth="360" MinHeight="240"
+        CanResize="False"
+        SystemDecorations="BorderOnly"
+        WindowStartupLocation="Manual"
+        Title="ShareX Mac — Capture"
+        Background="#FF1E1E1E">
+    <Grid RowDefinitions="*,Auto" Margin="12">
+        <Border Grid.Row="0" Background="#FF2D2D2D" CornerRadius="4">
+            <Image Source="{Binding Thumbnail}" Stretch="Uniform" Margin="4" />
+        </Border>
+        <StackPanel Grid.Row="1" Orientation="Horizontal"
+                    HorizontalAlignment="Center" Spacing="8" Margin="0,10,0,0">
+            <Button Content="Copy Image"
+                    Command="{Binding CopyImageCommand}"
+                    Background="#FF0078D4" Foreground="White"
+                    Padding="12,6" />
+            <Button Content="Copy Path"
+                    Command="{Binding CopyPathCommand}"
+                    Padding="12,6" />
+            <Button Content="Open in Finder"
+                    Command="{Binding OpenInFinderCommand}"
+                    Padding="12,6" />
+            <Button Content="Dismiss"
+                    Command="{Binding DismissCommand}"
+                    Padding="12,6" />
+        </StackPanel>
+    </Grid>
+</Window>
