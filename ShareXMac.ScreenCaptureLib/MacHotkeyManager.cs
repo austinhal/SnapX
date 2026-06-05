@@ -34,6 +34,12 @@ public class MacHotkeyManager : IHotkeyManager, IDisposable
     [DllImport("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics")]
     private static extern long CGEventGetIntegerValueField(nint eventRef, int field);
 
+    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
+    private static extern void CFMachPortInvalidate(nint port);
+
+    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
+    private static extern void CFRelease(nint cf);
+
     // Non-blocking accessibility check — does not trigger a permission dialog
     [DllImport("/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
     private static extern bool AXIsProcessTrustedWithOptions(nint options);
@@ -113,5 +119,13 @@ public class MacHotkeyManager : IHotkeyManager, IDisposable
         _ => -1
     };
 
-    public void Dispose() => _tapPort = 0;
+    public void Dispose()
+    {
+        if (_tapPort != 0)
+        {
+            CFMachPortInvalidate(_tapPort);
+            CFRelease(_tapPort);
+            _tapPort = 0;
+        }
+    }
 }

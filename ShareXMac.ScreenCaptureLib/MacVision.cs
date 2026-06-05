@@ -58,6 +58,10 @@ internal static class MacVision
 
         EnsureFrameworkLoaded();
 
+        // NSAutoreleasePool so autoreleased ObjC objects are reclaimed promptly
+        nint pool = ObjCRuntime.Send(
+            ObjCRuntime.Send(ObjCRuntime.GetClass("NSAutoreleasePool"), "alloc"), "init");
+
         // 1. Create NSData
         nint nsData;
         fixed (byte* ptr = imageData)
@@ -67,31 +71,69 @@ internal static class MacVision
                 ObjCRuntime.Sel("initWithBytes:length:"),
                 (nint)ptr, (nuint)imageData.Length);
         }
-        if (nsData == 0) return Task.FromResult<string?>(null);
+        if (nsData == 0)
+        {
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>(null);
+        }
 
         // 2. NSData -> NSImage -> TIFFRepresentation -> NSBitmapImageRep -> CGImage
         nint nsImage = ObjCRuntime.Send(
             ObjCRuntime.Send(ObjCRuntime.GetClass("NSImage"), "alloc"),
             "initWithData:", nsData);
-        if (nsImage == 0) return Task.FromResult<string?>(null);
+        ObjCRuntime.Send(nsData, "release");
+        if (nsImage == 0)
+        {
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>(null);
+        }
 
         nint tiffData = ObjCRuntime.Send(nsImage, "TIFFRepresentation");
-        if (tiffData == 0) return Task.FromResult<string?>(null);
+        // tiffData is autoreleased — no explicit release needed
+
+        if (tiffData == 0)
+        {
+            ObjCRuntime.Send(nsImage, "release");
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>(null);
+        }
 
         nint bitmapRep = ObjCRuntime.Send(
             ObjCRuntime.Send(ObjCRuntime.GetClass("NSBitmapImageRep"), "alloc"),
             "initWithData:", tiffData);
-        if (bitmapRep == 0) return Task.FromResult<string?>(null);
+        if (bitmapRep == 0)
+        {
+            ObjCRuntime.Send(nsImage, "release");
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>(null);
+        }
 
         nint cgImage = ObjCRuntime.Send(bitmapRep, "CGImage");
-        if (cgImage == 0) return Task.FromResult<string?>(null);
+        // cgImage is owned by bitmapRep — do not release separately
 
-        // 3. VNImageRequestHandler with CGImage
+        if (cgImage == 0)
+        {
+            ObjCRuntime.Send(bitmapRep, "release");
+            ObjCRuntime.Send(nsImage, "release");
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>(null);
+        }
+
+        // 3. VNImageRequestHandler with CGImage — retains cgImage internally
         nint emptyDict = ObjCRuntime.Send(ObjCRuntime.GetClass("NSDictionary"), "dictionary");
         nint handler = ObjCRuntime.Send(
             ObjCRuntime.Send(ObjCRuntime.GetClass("VNImageRequestHandler"), "alloc"),
             "initWithCGImage:options:", cgImage, emptyDict);
-        if (handler == 0) return Task.FromResult<string?>(null);
+
+        // bitmapRep (and nsImage) can be released now — handler retains cgImage
+        ObjCRuntime.Send(bitmapRep, "release");
+        ObjCRuntime.Send(nsImage, "release");
+
+        if (handler == 0)
+        {
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>(null);
+        }
 
         // 4. Build global ObjC block
         var descriptor = new BlockDescriptor
@@ -108,7 +150,7 @@ internal static class MacVision
         var blockLit = new BlockLiteral
         {
             Isa = isaPtr,
-            Flags = 0x50000000,
+            Flags = 0x10000000, // BLOCK_IS_GLOBAL only — no signature string in descriptor
             Reserved = 0,
             Invoke = s_completionFuncPtr,
             Descriptor = descPtr
@@ -135,12 +177,23 @@ internal static class MacVision
         Marshal.FreeHGlobal((nint)blockPtr);
         Marshal.FreeHGlobal((nint)descPtr);
 
+        ObjCRuntime.Send(request, "release");
+        ObjCRuntime.Send(handler, "release");
+
         // 7. Extract text from results
         nint results = t_pendingResults;
-        if (results == 0) return Task.FromResult<string?>(null);
+        if (results == 0)
+        {
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>(null);
+        }
 
         nint count = ObjCRuntime.ArrayCount(results);
-        if (count == 0) return Task.FromResult<string?>("");
+        if (count == 0)
+        {
+            ObjCRuntime.Send(pool, "drain");
+            return Task.FromResult<string?>("");
+        }
 
         var sb = new System.Text.StringBuilder();
         for (nint i = 0; i < count; i++)
@@ -160,6 +213,7 @@ internal static class MacVision
             }
         }
 
+        ObjCRuntime.Send(pool, "drain");
         return Task.FromResult<string?>(sb.Length > 0 ? sb.ToString() : null);
     }
 }
