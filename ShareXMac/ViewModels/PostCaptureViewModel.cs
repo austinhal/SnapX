@@ -10,7 +10,7 @@ namespace ShareXMac.ViewModels;
 public partial class PostCaptureViewModel : ObservableObject
 {
     public string FilePath { get; }
-    public Bitmap? Thumbnail { get; private set; }
+    public Bitmap Thumbnail { get; }
     public int AutoDismissSeconds { get; init; } = 8;
     private readonly byte[] _imageData;
 
@@ -20,21 +20,8 @@ public partial class PostCaptureViewModel : ObservableObject
     {
         FilePath = result.FilePath;
         _imageData = result.ImageData;
-        TryLoadThumbnail(result.ImageData);
-    }
-
-    private void TryLoadThumbnail(byte[] imageData)
-    {
-        try
-        {
-            using var ms = new MemoryStream(imageData);
-            Thumbnail = new Bitmap(ms);
-        }
-        catch
-        {
-            // Bitmap loading failed (e.g., in unit tests without Avalonia platform)
-            Thumbnail = null;
-        }
+        using var ms = new MemoryStream(result.ImageData);
+        Thumbnail = new Bitmap(ms);
     }
 
     [RelayCommand]
