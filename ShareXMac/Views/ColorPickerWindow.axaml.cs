@@ -33,8 +33,12 @@ public partial class ColorPickerWindow : Window
         else if (e.Key == Key.Enter) { PickAndClose((ColorPickerViewModel)DataContext!); e.Handled = true; }
     }
 
+    private bool _closing;
+
     private void PickAndClose(ColorPickerViewModel vm)
     {
+        if (_closing) return;
+        _closing = true;
         vm.CopyHexCommand.Execute(null);
         Close();
     }

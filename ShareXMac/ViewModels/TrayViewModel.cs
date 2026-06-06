@@ -142,13 +142,22 @@ public partial class TrayViewModel : ObservableObject
         });
     }
 
+    private ColorPickerWindow? _colorPickerWindow;
+
     [RelayCommand]
     private void OpenColorPicker()
     {
         Dispatcher.UIThread.Post(() =>
         {
+            if (_colorPickerWindow != null)
+            {
+                _colorPickerWindow.Activate();
+                return;
+            }
             var vm = new ColorPickerViewModel();
-            new ColorPickerWindow(vm).Show();
+            _colorPickerWindow = new ColorPickerWindow(vm);
+            _colorPickerWindow.Closed += (_, _) => _colorPickerWindow = null;
+            _colorPickerWindow.Show();
         });
     }
 
