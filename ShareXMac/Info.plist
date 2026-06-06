@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.austinhal.snapx</string>
+    <key>CFBundleName</key>
+    <string>SnapX</string>
+    <key>CFBundleDisplayName</key>
+    <string>SnapX</string>
+    <key>CFBundleExecutable</key>
+    <string>SnapX</string>
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>13.0</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>SnapX needs screen recording permission to capture screenshots and record your screen.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>SnapX needs Automation permission to manage Login Items.</string>
+</dict>
+</plist>
