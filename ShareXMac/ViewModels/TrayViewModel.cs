@@ -143,6 +143,16 @@ public partial class TrayViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OpenColorPicker()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var vm = new ColorPickerViewModel();
+            new ColorPickerWindow(vm).Show();
+        });
+    }
+
+    [RelayCommand]
     private static void Quit()
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime app)

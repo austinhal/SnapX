@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ShareXMac.ViewModels"
+        x:Class="ShareXMac.Views.ColorPickerWindow"
+        x:DataType="vm:ColorPickerViewModel"
+        Width="162" Height="270"
+        CanResize="False"
+        SystemDecorations="None"
+        Topmost="True"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF1E1E1E"
+        Title="Color Picker">
+    <StackPanel Margin="6" Spacing="4">
+
+        <!-- Magnified pixel view with center-pixel border overlay -->
+        <Grid Width="150" Height="150" HorizontalAlignment="Center">
+            <Image Source="{Binding MagnifiedView}"
+                   Width="150" Height="150"
+                   RenderOptions.BitmapInterpolationMode="None"
+                   Stretch="Fill" />
+            <!-- Center pixel highlight: the sampled pixel is at position 7,7 (0-based)
+                 Each logical pixel is 10x10 — so the center square starts at (70,70) -->
+            <Canvas Width="150" Height="150" IsHitTestVisible="False">
+                <Rectangle Canvas.Left="70" Canvas.Top="70"
+                           Width="10" Height="10"
+                           Stroke="White" StrokeThickness="1"
+                           Fill="Transparent" Opacity="0.85" />
+            </Canvas>
+        </Grid>
+
+        <!-- Color swatch -->
+        <Border Height="22" CornerRadius="3"
+                Background="{Binding SwatchBrush}"
+                HorizontalAlignment="Stretch" />
+
+        <!-- Hex value (large, monospaced) -->
+        <TextBlock Text="{Binding Hex}"
+                   Foreground="White"
+                   FontSize="16"
+                   FontFamily="Menlo,Courier New,monospace"
+                   HorizontalAlignment="Center" />
+
+        <!-- RGB row -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center" Spacing="10">
+            <TextBlock Text="{Binding R, StringFormat='R {0}'}"
+                       Foreground="#FFCC4444" FontSize="11" />
+            <TextBlock Text="{Binding G, StringFormat='G {0}'}"
+                       Foreground="#FF44CC44" FontSize="11" />
+            <TextBlock Text="{Binding B, StringFormat='B {0}'}"
+                       Foreground="#FF4488FF" FontSize="11" />
+        </StackPanel>
+
+        <!-- HSV row -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center" Spacing="10">
+            <TextBlock Text="{Binding Hue,        StringFormat='H {0:F0}°'}"
+                       Foreground="#FFAAAAAA" FontSize="11" />
+            <TextBlock Text="{Binding Saturation, StringFormat='S {0:F0}%'}"
+                       Foreground="#FFAAAAAA" FontSize="11" />
+            <TextBlock Text="{Binding Value,      StringFormat='V {0:F0}%'}"
+                       Foreground="#FFAAAAAA" FontSize="11" />
+        </StackPanel>
+
+        <!-- Hint -->
+        <TextBlock Text="Click or Enter to copy  ·  Esc to cancel"
+                   Foreground="#FF666666" FontSize="10"
+                   HorizontalAlignment="Center" />
+
+    </StackPanel>
+</Window>

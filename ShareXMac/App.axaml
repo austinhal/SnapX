@@ -22,6 +22,9 @@
                         <NativeMenuItem Header="{Binding RecordGifHeader}"
                                         Command="{Binding RecordGifCommand}" />
                         <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Color Picker"
+                                        Command="{Binding OpenColorPickerCommand}" />
+                        <NativeMenuItemSeparator />
                         <NativeMenuItem Header="Settings..."
                                         Command="{Binding OpenSettingsCommand}" />
                         <NativeMenuItem Header="History..."
