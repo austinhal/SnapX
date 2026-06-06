@@ -38,15 +38,7 @@ public partial class ColorPickerViewModel : ObservableObject
         Hue = h; Saturation = s; Value = v;
         SwatchBrush = new SolidColorBrush(new Color(255, c.R, c.G, c.B));
 
-        try
-        {
-            MagnifiedView = BuildMagnifiedBitmap(pixels, size);
-        }
-        catch
-        {
-            // Avalonia platform may not be initialized in unit test environments
-            MagnifiedView = null;
-        }
+        MagnifiedView = BuildMagnifiedBitmap(pixels, size);
     }
 
     [RelayCommand]

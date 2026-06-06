@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Headless;
 using ShareXMac.Models;
 using ShareXMac.ViewModels;
 using Xunit;
@@ -6,8 +8,28 @@ namespace ShareXMac.Tests;
 
 public class ColorPickerViewModelTests
 {
+    private static readonly Lazy<bool> AvaloniaInitialized = new Lazy<bool>(() =>
+    {
+        try
+        {
+            AppBuilder.Configure<Application>()
+                .UseHeadless(new AvaloniaHeadlessPlatformOptions())
+                .SetupWithoutStarting();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    });
+
     private static SampledColor[] AllColor(byte r, byte g, byte b)
         => Enumerable.Repeat(new SampledColor(r, g, b), 15 * 15).ToArray();
+
+    public ColorPickerViewModelTests()
+    {
+        _ = AvaloniaInitialized.Value;
+    }
 
     [Fact]
     public void Refresh_SetsHex_FromCenterPixel()
@@ -36,13 +58,11 @@ public class ColorPickerViewModelTests
     }
 
     [Fact]
-    public void Refresh_SetsSwatchBrush_MatchingColor()
+    public void Refresh_SetsMagnifiedView_NonNull()
     {
         var vm = new ColorPickerViewModel(() => AllColor(128, 64, 32));
         vm.Refresh();
-        Assert.Equal(128, vm.R);
-        Assert.Equal(64, vm.G);
-        Assert.Equal(32, vm.B);
+        Assert.NotNull(vm.MagnifiedView);
     }
 
     [Fact]
