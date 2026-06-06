@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
     <key>CFBundleIdentifier</key>
     <string>com.austinhal.snapx</string>
     <key>CFBundleName</key>
@@ -26,7 +28,5 @@
     <true/>
     <key>NSScreenCaptureUsageDescription</key>
     <string>SnapX needs screen recording permission to capture screenshots and record your screen.</string>
-    <key>NSAppleEventsUsageDescription</key>
-    <string>SnapX needs Automation permission to manage Login Items.</string>
 </dict>
 </plist>
