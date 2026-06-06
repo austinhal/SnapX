@@ -18,7 +18,7 @@ public class UploadServiceTests
     public async Task UploadImageAsync_EmptyClientId_ReturnsNull()
     {
         var svc = new UploadService();
-        var settings = new AppSettings { ImgurClientId = "" };
+        var settings = new AppSettings { ImgurClientId = "", ActiveImageDestination = ImageDestination.Imgur };
         byte[] data = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; // PNG magic bytes only
         var result = await svc.UploadImageAsync(data, "test.png", settings);
         Assert.Null(result);
