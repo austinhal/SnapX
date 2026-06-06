@@ -26,6 +26,13 @@ public class KeyComboHelperTests
     }
 
     [Fact]
+    public void Parse_ReturnsNull_ForTrailingPlus()
+    {
+        Assert.Null(KeyComboHelper.Parse("Cmd+Shift+"));
+        Assert.Null(KeyComboHelper.Parse("Cmd+"));
+    }
+
+    [Fact]
     public void Parse_ExtractsModifiersAndKey()
     {
         var combo = KeyComboHelper.Parse("Cmd+Shift+3");
