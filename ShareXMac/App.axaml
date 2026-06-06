@@ -17,9 +17,9 @@
                         <NativeMenuItem Header="Capture Fullscreen"
                                         Command="{Binding CaptureFullscreenCommand}" />
                         <NativeMenuItemSeparator />
-                        <NativeMenuItem Header="Record Video"
+                        <NativeMenuItem Header="{Binding RecordVideoHeader}"
                                         Command="{Binding RecordVideoCommand}" />
-                        <NativeMenuItem Header="Record GIF"
+                        <NativeMenuItem Header="{Binding RecordGifHeader}"
                                         Command="{Binding RecordGifCommand}" />
                         <NativeMenuItemSeparator />
                         <NativeMenuItem Header="Settings..."
