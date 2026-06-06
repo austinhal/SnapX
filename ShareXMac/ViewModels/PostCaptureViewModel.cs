@@ -53,6 +53,7 @@ public partial class PostCaptureViewModel : ObservableObject, IDisposable
         {
             string fileName = Path.GetFileName(FilePath);
             string? url = await _uploadService.UploadImageAsync(_imageData, fileName, _settings);
+            IsUploading = false;
             if (url != null)
             {
                 UploadedUrl = url;

@@ -41,7 +41,7 @@
         </StackPanel>
 
         <!-- Upload status row -->
-        <Grid Grid.Row="2" Margin="0,6,0,0" ColumnDefinitions="*,Auto"
+        <Grid Grid.Row="2" Margin="0,6,0,0" ColumnDefinitions="*"
               IsVisible="{Binding IsUploading}">
             <TextBlock Grid.Column="0" Text="Uploading…"
                        Foreground="#FFAAAAAA" FontSize="11"
