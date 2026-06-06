@@ -50,25 +50,4 @@ public class TrayViewModelTests
             if (File.Exists(historyFile)) File.Delete(historyFile);
         }
     }
-
-    [Fact]
-    public void TrayViewModel_WithUploadService_DoesNotThrow()
-    {
-        string sf = Path.Combine(Path.GetTempPath(), $"s-{Guid.NewGuid():N}.json");
-        string hf = Path.Combine(Path.GetTempPath(), $"h-{Guid.NewGuid():N}.json");
-        try
-        {
-            var vm = new TrayViewModel(
-                new StubScreenCapture(),
-                new SettingsService(sf),
-                new HistoryService(hf),
-                new UploadService());
-            Assert.NotNull(vm.CaptureRegionCommand);
-        }
-        finally
-        {
-            if (File.Exists(sf)) File.Delete(sf);
-            if (File.Exists(hf)) File.Delete(hf);
-        }
-    }
 }

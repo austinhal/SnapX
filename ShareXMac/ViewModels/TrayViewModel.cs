@@ -153,7 +153,8 @@ public partial class TrayViewModel : ObservableObject
                 var result = new CaptureResult(data, path);
                 var vm = new PostCaptureViewModel(result, _upload, _settings.Current)
                 {
-                    AutoDismissSeconds = _settings.Current.PostCaptureToolbarTimeoutSeconds
+                    AutoDismissSeconds = _settings.Current.PostCaptureToolbarTimeoutSeconds,
+                    UploadedUrl = url
                 };
                 new PostCaptureWindow(vm).Show();
             });

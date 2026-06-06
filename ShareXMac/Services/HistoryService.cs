@@ -22,7 +22,7 @@ public class HistoryService
             FilePath = filePath,
             DateTime = DateTime.Now,
             Type = "Image",
-            Host = url != null ? new Uri(url).Host : "",
+            Host = url != null && Uri.TryCreate(url, UriKind.Absolute, out var u) ? u.Host : "",
             URL = url ?? ""
         });
     }
