@@ -3,7 +3,7 @@
         xmlns:vm="using:ShareXMac.ViewModels"
         x:Class="ShareXMac.Views.SettingsWindow"
         x:DataType="vm:SettingsViewModel"
-        Width="480" Height="440"
+        Width="480" Height="480"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
         Title="ShareX Mac — Settings">
@@ -55,6 +55,13 @@
             </Grid>
             <TextBlock Text="Imgur anonymous upload requires a free Client ID (no login needed)."
                        FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+
+            <Separator />
+
+            <!-- System -->
+            <TextBlock Text="System" FontWeight="SemiBold" />
+            <CheckBox Content="Launch at Login"
+                      IsChecked="{Binding LaunchAtLogin}" />
 
             <Separator />
 

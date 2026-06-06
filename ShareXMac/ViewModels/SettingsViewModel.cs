@@ -8,6 +8,7 @@ namespace ShareXMac.ViewModels;
 public partial class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _service;
+    private readonly LoginItemService _loginItems;
 
     [ObservableProperty] private string _savePath = "";
     [ObservableProperty] private bool _autoCopyImage;
@@ -16,12 +17,14 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _imgurClientId = "";
     [ObservableProperty] private ImageDestination _activeImageDestination;
     [ObservableProperty] private bool _autoUploadAfterCapture;
+    [ObservableProperty] private bool _launchAtLogin;
 
     public event Action? CloseRequested;
 
-    public SettingsViewModel(SettingsService service)
+    public SettingsViewModel(SettingsService service, LoginItemService? loginItems = null)
     {
         _service = service;
+        _loginItems = loginItems ?? new LoginItemService();
         var s = service.Current;
         SavePath = s.SavePath;
         AutoCopyImage = s.AutoCopyImage;
@@ -30,6 +33,7 @@ public partial class SettingsViewModel : ObservableObject
         ImgurClientId = s.ImgurClientId;
         ActiveImageDestination = s.ActiveImageDestination;
         AutoUploadAfterCapture = s.AutoUploadAfterCapture;
+        LaunchAtLogin = _loginItems.IsEnabled;
     }
 
     [RelayCommand]
@@ -57,6 +61,18 @@ public partial class SettingsViewModel : ObservableObject
         _service.Current.ActiveImageDestination = ActiveImageDestination;
         _service.Current.AutoUploadAfterCapture = AutoUploadAfterCapture;
         _service.Save();
+
+        if (LaunchAtLogin && !_loginItems.IsEnabled)
+        {
+            string exe = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName
+                         ?? Path.Combine(AppContext.BaseDirectory, "SnapX");
+            _loginItems.Enable(exe);
+        }
+        else if (!LaunchAtLogin && _loginItems.IsEnabled)
+        {
+            _loginItems.Disable();
+        }
+
         CloseRequested?.Invoke();
     }
 }
