@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using ShareXMac.Models;
+using ShareXMac.Models; // SampledColor lives in HelpersLib but retains this namespace for consumer compatibility
 using ShareXMac.ScreenCaptureLib.ObjC;
 
 namespace ShareXMac.ScreenCaptureLib;
@@ -98,6 +98,7 @@ public static class MacColorSampler
                 // Physical image dimensions (may be 2x logical on Retina)
                 int imgW = stride / bpp;
                 int imgH = byteCount / stride;
+                if (imgW == 0 || imgH == 0) return fallback;
                 double sx = (double)imgW / size;
                 double sy = (double)imgH / size;
 
@@ -109,7 +110,7 @@ public static class MacColorSampler
                         int px     = (int)(lx * sx);
                         int py     = (int)(ly * sy);
                         int offset = py * stride + px * bpp;
-                        if (offset + 2 < raw.Length)
+                        if (offset + 3 < raw.Length)
                         {
                             // CGDisplayCreateImageForRect returns BGRA8888 on macOS
                             byte b = raw[offset], g = raw[offset + 1], r = raw[offset + 2];
