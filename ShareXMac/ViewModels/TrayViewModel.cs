@@ -17,16 +17,19 @@ public partial class TrayViewModel : ObservableObject
     private readonly IScreenCapture _capture;
     private readonly SettingsService _settings;
     private readonly HistoryService _history;
+    private readonly UploadService _upload;
     private bool _isRecording;
 
     public TrayViewModel(
         IScreenCapture capture,
         SettingsService settings,
-        HistoryService history)
+        HistoryService history,
+        UploadService upload)
     {
         _capture = capture;
         _settings = settings;
         _history = history;
+        _upload = upload;
     }
 
     [RelayCommand]
@@ -123,19 +126,32 @@ public partial class TrayViewModel : ObservableObject
         string path = Path.Combine(dir, $"ShareX-{DateTime.Now:yyyy-MM-dd-HHmmss}.png");
         await File.WriteAllBytesAsync(path, data);
 
-        _history.AddCapture(path);
+        // Auto-upload before recording history so URL is captured
+        string? url = null;
+        if (_settings.Current.AutoUploadAfterCapture)
+        {
+            url = await _upload.UploadImageAsync(data, Path.GetFileName(path), _settings.Current);
+            if (url != null)
+                MacClipboard.SetText(url);
+        }
 
-        if (_settings.Current.AutoCopyImage)
-            MacClipboard.SetImage(data);
-        else
-            MacClipboard.SetText(path);
+        _history.AddCapture(path, url);
+
+        // Clipboard (image or path) — only if we didn't already set a URL
+        if (url == null)
+        {
+            if (_settings.Current.AutoCopyImage)
+                MacClipboard.SetImage(data);
+            else
+                MacClipboard.SetText(path);
+        }
 
         if (_settings.Current.ShowPostCaptureToolbar)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 var result = new CaptureResult(data, path);
-                var vm = new PostCaptureViewModel(result, new UploadService(), _settings.Current)
+                var vm = new PostCaptureViewModel(result, _upload, _settings.Current)
                 {
                     AutoDismissSeconds = _settings.Current.PostCaptureToolbarTimeoutSeconds
                 };
