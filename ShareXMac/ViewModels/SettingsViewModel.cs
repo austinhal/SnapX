@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ShareX.UploadersLib;
+using ShareXMac.Models;
 using ShareXMac.Services;
 
 namespace ShareXMac.ViewModels;
@@ -19,21 +20,35 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _autoUploadAfterCapture;
     [ObservableProperty] private bool _launchAtLogin;
 
+    // Hotkeys — displayed and edited as "Modifier+Key" strings (e.g. "Cmd+Shift+3")
+    [ObservableProperty] private string _captureRegionHotkey = "";
+    [ObservableProperty] private string _captureWindowHotkey = "";
+    [ObservableProperty] private string _captureFullscreenHotkey = "";
+    [ObservableProperty] private string _recordVideoHotkey = "";
+    [ObservableProperty] private string _recordGifHotkey = "";
+
     public event Action? CloseRequested;
 
     public SettingsViewModel(SettingsService service, LoginItemService? loginItems = null)
     {
-        _service = service;
+        _service    = service;
         _loginItems = loginItems ?? new LoginItemService();
         var s = service.Current;
-        SavePath = s.SavePath;
-        AutoCopyImage = s.AutoCopyImage;
-        ShowPostCaptureToolbar = s.ShowPostCaptureToolbar;
+        SavePath                  = s.SavePath;
+        AutoCopyImage             = s.AutoCopyImage;
+        ShowPostCaptureToolbar    = s.ShowPostCaptureToolbar;
         PostCaptureTimeoutSeconds = s.PostCaptureToolbarTimeoutSeconds;
-        ImgurClientId = s.ImgurClientId;
-        ActiveImageDestination = s.ActiveImageDestination;
-        AutoUploadAfterCapture = s.AutoUploadAfterCapture;
-        LaunchAtLogin = _loginItems.IsEnabled;
+        ImgurClientId             = s.ImgurClientId;
+        ActiveImageDestination    = s.ActiveImageDestination;
+        AutoUploadAfterCapture    = s.AutoUploadAfterCapture;
+        LaunchAtLogin             = _loginItems.IsEnabled;
+
+        var h = s.Hotkeys;
+        CaptureRegionHotkey     = KeyComboHelper.ToString(h.CaptureRegion);
+        CaptureWindowHotkey     = KeyComboHelper.ToString(h.CaptureWindow);
+        CaptureFullscreenHotkey = KeyComboHelper.ToString(h.CaptureFullscreen);
+        RecordVideoHotkey       = KeyComboHelper.ToString(h.RecordVideo);
+        RecordGifHotkey         = KeyComboHelper.ToString(h.RecordGif);
     }
 
     [RelayCommand]
@@ -50,16 +65,29 @@ public partial class SettingsViewModel : ObservableObject
             SavePath = result[0].Path.LocalPath;
     }
 
+    [RelayCommand] private void ClearCaptureRegionHotkey()    => CaptureRegionHotkey = "";
+    [RelayCommand] private void ClearCaptureWindowHotkey()    => CaptureWindowHotkey = "";
+    [RelayCommand] private void ClearCaptureFullscreenHotkey() => CaptureFullscreenHotkey = "";
+    [RelayCommand] private void ClearRecordVideoHotkey()      => RecordVideoHotkey = "";
+    [RelayCommand] private void ClearRecordGifHotkey()        => RecordGifHotkey = "";
+
     [RelayCommand]
     private void Save()
     {
-        _service.Current.SavePath = SavePath;
-        _service.Current.AutoCopyImage = AutoCopyImage;
-        _service.Current.ShowPostCaptureToolbar = ShowPostCaptureToolbar;
+        _service.Current.SavePath                         = SavePath;
+        _service.Current.AutoCopyImage                    = AutoCopyImage;
+        _service.Current.ShowPostCaptureToolbar           = ShowPostCaptureToolbar;
         _service.Current.PostCaptureToolbarTimeoutSeconds = PostCaptureTimeoutSeconds;
-        _service.Current.ImgurClientId = ImgurClientId;
-        _service.Current.ActiveImageDestination = ActiveImageDestination;
-        _service.Current.AutoUploadAfterCapture = AutoUploadAfterCapture;
+        _service.Current.ImgurClientId                    = ImgurClientId;
+        _service.Current.ActiveImageDestination           = ActiveImageDestination;
+        _service.Current.AutoUploadAfterCapture           = AutoUploadAfterCapture;
+
+        _service.Current.Hotkeys.CaptureRegion     = KeyComboHelper.Parse(CaptureRegionHotkey);
+        _service.Current.Hotkeys.CaptureWindow     = KeyComboHelper.Parse(CaptureWindowHotkey);
+        _service.Current.Hotkeys.CaptureFullscreen = KeyComboHelper.Parse(CaptureFullscreenHotkey);
+        _service.Current.Hotkeys.RecordVideo       = KeyComboHelper.Parse(RecordVideoHotkey);
+        _service.Current.Hotkeys.RecordGif         = KeyComboHelper.Parse(RecordGifHotkey);
+
         _service.Save();
 
         if (LaunchAtLogin && !_loginItems.IsEnabled)
