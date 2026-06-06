@@ -18,12 +18,13 @@ public partial class App : Application
             "ShareX-Mac");
         Directory.CreateDirectory(appSupport);
 
-        var settings = new SettingsService(Path.Combine(appSupport, "settings.json"));
-        var history  = new HistoryService(Path.Combine(appSupport, "history.json"));
-        var capture  = new MacScreenCapture();
-        var upload   = new UploadService();
+        var settings      = new SettingsService(Path.Combine(appSupport, "settings.json"));
+        var history       = new HistoryService(Path.Combine(appSupport, "history.json"));
+        var capture       = new MacScreenCapture();
+        var upload        = new UploadService();
+        var hotkeyManager = new MacHotkeyManager();
 
-        DataContext = new TrayViewModel(capture, settings, history, upload);
+        DataContext = new TrayViewModel(capture, settings, history, upload, hotkeyManager);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnExplicitShutdown;

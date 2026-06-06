@@ -11,6 +11,12 @@ public class MacHotkeyManager : IHotkeyManager, IDisposable
     private const ulong kCGEventKeyDownMask = 1ul << 10;
     private const int kCGKeyboardEventKeycode = 9;
 
+    // CGEventFlags bitmasks
+    private const ulong FlagShift   = 0x00020000UL;
+    private const ulong FlagControl = 0x00040000UL;
+    private const ulong FlagAlt     = 0x00080000UL;
+    private const ulong FlagCommand = 0x00100000UL;
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate nint CGEventCallback(nint proxy, uint type, nint eventRef, nint userInfo);
 
@@ -33,6 +39,9 @@ public class MacHotkeyManager : IHotkeyManager, IDisposable
 
     [DllImport("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics")]
     private static extern long CGEventGetIntegerValueField(nint eventRef, int field);
+
+    [DllImport("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics")]
+    private static extern ulong CGEventGetFlags(nint eventRef);
 
     [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
     private static extern void CFMachPortInvalidate(nint port);
@@ -98,9 +107,21 @@ public class MacHotkeyManager : IHotkeyManager, IDisposable
         if (type == 10) // kCGEventKeyDown
         {
             long keycode = CGEventGetIntegerValueField(eventRef, kCGKeyboardEventKeycode);
+            ulong flags  = CGEventGetFlags(eventRef);
+            bool cmdHeld   = (flags & FlagCommand) != 0;
+            bool shiftHeld = (flags & FlagShift)   != 0;
+            bool ctrlHeld  = (flags & FlagControl) != 0;
+            bool altHeld   = (flags & FlagAlt)     != 0;
+
             foreach (var (_, (combo, callback)) in _hotkeys)
             {
-                if (GetVirtualKeyCode(combo.Key) == keycode)
+                if (GetVirtualKeyCode(combo.Key) != keycode) continue;
+                bool needsCmd   = combo.Modifiers.Contains("Cmd");
+                bool needsShift = combo.Modifiers.Contains("Shift");
+                bool needsCtrl  = combo.Modifiers.Contains("Ctrl");
+                bool needsAlt   = combo.Modifiers.Contains("Alt");
+                if (cmdHeld == needsCmd && shiftHeld == needsShift
+                    && ctrlHeld == needsCtrl && altHeld == needsAlt)
                     callback();
             }
         }

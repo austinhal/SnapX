@@ -54,6 +54,16 @@ public class SettingsServiceTests
         Assert.Equal(ImageDestination.Imgur, s.ActiveImageDestination);
         Assert.False(s.AutoUploadAfterCapture);
     }
+
+    [Fact]
+    public void SettingsService_FiresSavedEvent_WhenSaveCalled()
+    {
+        bool fired = false;
+        var svc = new SettingsService(Path.GetTempFileName());
+        svc.Saved += () => fired = true;
+        svc.Save();
+        Assert.True(fired);
+    }
 }
 
 public class SettingsViewModelTests

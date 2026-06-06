@@ -9,6 +9,8 @@ public class SettingsService
 
     public AppSettings Current { get; private set; }
 
+    public event Action? Saved;
+
     public SettingsService(string filePath)
     {
         _filePath = filePath;
@@ -33,5 +35,6 @@ public class SettingsService
     {
         Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
         File.WriteAllText(_filePath, JsonConvert.SerializeObject(Current, Formatting.Indented));
+        Saved?.Invoke();
     }
 }

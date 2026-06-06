@@ -18,51 +18,81 @@ public partial class TrayViewModel : ObservableObject
     private readonly SettingsService _settings;
     private readonly HistoryService _history;
     private readonly UploadService _upload;
-    private bool _isRecording;
+    private readonly IHotkeyManager _hotkeyManager;
+
+    [ObservableProperty] private bool _isRecording;
+
+    public string RecordVideoHeader => IsRecording ? "Stop Recording (Video)" : "Record Video";
+    public string RecordGifHeader   => IsRecording ? "Stop Recording (GIF)"   : "Record GIF";
 
     public TrayViewModel(
         IScreenCapture capture,
         SettingsService settings,
         HistoryService history,
-        UploadService upload)
+        UploadService upload,
+        IHotkeyManager hotkeyManager)
     {
-        _capture = capture;
-        _settings = settings;
-        _history = history;
-        _upload = upload;
+        _capture      = capture;
+        _settings     = settings;
+        _history      = history;
+        _upload       = upload;
+        _hotkeyManager = hotkeyManager;
+        settings.Saved += RegisterHotkeys;
+        RegisterHotkeys();
+    }
+
+    partial void OnIsRecordingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(RecordVideoHeader));
+        OnPropertyChanged(nameof(RecordGifHeader));
+    }
+
+    private void RegisterHotkeys()
+    {
+        _hotkeyManager.UnregisterAll();
+        var h = _settings.Current.Hotkeys;
+        RegisterHotkey("capture-region",     h.CaptureRegion,    CaptureRegion);
+        RegisterHotkey("capture-window",     h.CaptureWindow,    CaptureWindow);
+        RegisterHotkey("capture-fullscreen", h.CaptureFullscreen, CaptureFullscreen);
+        RegisterHotkey("record-video",       h.RecordVideo,      RecordVideo);
+        RegisterHotkey("record-gif",         h.RecordGif,        RecordGif);
+    }
+
+    private void RegisterHotkey(string id, KeyCombo? combo, Func<Task> action)
+    {
+        if (combo == null) return;
+        _hotkeyManager.Register(id, combo,
+            () => Dispatcher.UIThread.Post(() => _ = action()));
     }
 
     [RelayCommand]
     private async Task CaptureRegion()
     {
         byte[]? data = await _capture.CaptureRegionAsync();
-        if (data != null)
-            await OnCaptureComplete(data);
+        if (data != null) await OnCaptureComplete(data);
     }
 
     [RelayCommand]
     private async Task CaptureWindow()
     {
         byte[]? data = await _capture.CaptureWindowAsync();
-        if (data != null)
-            await OnCaptureComplete(data);
+        if (data != null) await OnCaptureComplete(data);
     }
 
     [RelayCommand]
     private async Task CaptureFullscreen()
     {
         byte[]? data = await _capture.CaptureFullscreenAsync();
-        if (data != null)
-            await OnCaptureComplete(data);
+        if (data != null) await OnCaptureComplete(data);
     }
 
     [RelayCommand]
     private async Task RecordVideo()
     {
-        if (_isRecording)
+        if (IsRecording)
         {
             await _capture.StopRecordingAsync();
-            _isRecording = false;
+            IsRecording = false;
         }
         else
         {
@@ -70,17 +100,17 @@ public partial class TrayViewModel : ObservableObject
             Directory.CreateDirectory(dir);
             string path = Path.Combine(dir, $"ShareX-{DateTime.Now:yyyy-MM-dd-HHmmss}.mp4");
             await _capture.StartRecordingAsync(path, RecordingFormat.MP4);
-            _isRecording = true;
+            IsRecording = true;
         }
     }
 
     [RelayCommand]
     private async Task RecordGif()
     {
-        if (_isRecording)
+        if (IsRecording)
         {
             await _capture.StopRecordingAsync();
-            _isRecording = false;
+            IsRecording = false;
         }
         else
         {
@@ -88,7 +118,7 @@ public partial class TrayViewModel : ObservableObject
             Directory.CreateDirectory(dir);
             string path = Path.Combine(dir, $"ShareX-{DateTime.Now:yyyy-MM-dd-HHmmss}.gif");
             await _capture.StartRecordingAsync(path, RecordingFormat.GIF);
-            _isRecording = true;
+            IsRecording = true;
         }
     }
 
@@ -126,7 +156,6 @@ public partial class TrayViewModel : ObservableObject
         string path = Path.Combine(dir, $"ShareX-{DateTime.Now:yyyy-MM-dd-HHmmss}.png");
         await File.WriteAllBytesAsync(path, data);
 
-        // Auto-upload before recording history so URL is captured
         string? url = null;
         if (_settings.Current.AutoUploadAfterCapture)
         {

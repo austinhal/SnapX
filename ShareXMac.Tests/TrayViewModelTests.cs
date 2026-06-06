@@ -1,6 +1,7 @@
 using ShareXMac.ViewModels;
 using ShareXMac.Platform;
 using ShareXMac.Services;
+using ShareXMac.ScreenCaptureLib;
 using ShareX.HelpersLib;
 using Xunit;
 
@@ -15,7 +16,8 @@ public class TrayViewModelTests
             new StubScreenCapture(),
             new SettingsService(Path.GetTempFileName()),
             new HistoryService(Path.GetTempFileName()),
-            new UploadService());
+            new UploadService(),
+            new StubHotkeyManager());
         Assert.NotNull(vm.CaptureRegionCommand);
     }
 
@@ -26,7 +28,8 @@ public class TrayViewModelTests
             new StubScreenCapture(),
             new SettingsService(Path.GetTempFileName()),
             new HistoryService(Path.GetTempFileName()),
-            new UploadService());
+            new UploadService(),
+            new StubHotkeyManager());
         Assert.NotNull(vm.QuitCommand);
     }
 
@@ -41,7 +44,8 @@ public class TrayViewModelTests
                 new StubScreenCapture(),
                 new SettingsService(settingsFile),
                 new HistoryService(historyFile),
-                new UploadService());
+                new UploadService(),
+                new StubHotkeyManager());
             Assert.NotNull(vm.CaptureRegionCommand);
         }
         finally
@@ -50,4 +54,12 @@ public class TrayViewModelTests
             if (File.Exists(historyFile)) File.Delete(historyFile);
         }
     }
+}
+
+public class StubHotkeyManager : IHotkeyManager
+{
+    public bool IsAvailable => false;
+    public void Register(string id, KeyCombo combo, Action callback) { }
+    public void Unregister(string id) { }
+    public void UnregisterAll() { }
 }
