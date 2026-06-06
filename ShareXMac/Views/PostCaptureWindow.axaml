@@ -2,32 +2,63 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:ShareXMac.ViewModels"
         x:Class="ShareXMac.Views.PostCaptureWindow"
-        Width="360" Height="240"
-        MinWidth="360" MinHeight="240"
+        x:DataType="vm:PostCaptureViewModel"
+        Width="360" Height="280"
+        MinWidth="360" MinHeight="280"
         CanResize="False"
         SystemDecorations="BorderOnly"
         WindowStartupLocation="Manual"
         Title="ShareX Mac — Capture"
         Background="#FF1E1E1E">
-    <Grid RowDefinitions="*,Auto" Margin="12">
+    <Grid RowDefinitions="*,Auto,Auto" Margin="12">
+
+        <!-- Thumbnail -->
         <Border Grid.Row="0" Background="#FF2D2D2D" CornerRadius="4">
             <Image Source="{Binding Thumbnail}" Stretch="Uniform" Margin="4" />
         </Border>
+
+        <!-- Action buttons -->
         <StackPanel Grid.Row="1" Orientation="Horizontal"
-                    HorizontalAlignment="Center" Spacing="8" Margin="0,10,0,0">
+                    HorizontalAlignment="Center" Spacing="6" Margin="0,8,0,0">
             <Button Content="Copy Image"
                     Command="{Binding CopyImageCommand}"
                     Background="#FF0078D4" Foreground="White"
-                    Padding="12,6" />
+                    Padding="10,5" />
             <Button Content="Copy Path"
                     Command="{Binding CopyPathCommand}"
-                    Padding="12,6" />
+                    Padding="10,5" />
             <Button Content="Open in Finder"
                     Command="{Binding OpenInFinderCommand}"
-                    Padding="12,6" />
+                    Padding="10,5" />
+            <Button Content="Upload"
+                    Command="{Binding UploadCommand}"
+                    IsEnabled="{Binding !IsUploading}"
+                    Background="#FF107C10" Foreground="White"
+                    Padding="10,5" />
             <Button Content="Dismiss"
                     Command="{Binding DismissCommand}"
-                    Padding="12,6" />
+                    Padding="10,5" />
         </StackPanel>
+
+        <!-- Upload status row -->
+        <Grid Grid.Row="2" Margin="0,6,0,0" ColumnDefinitions="*,Auto"
+              IsVisible="{Binding IsUploading}">
+            <TextBlock Grid.Column="0" Text="Uploading…"
+                       Foreground="#FFAAAAAA" FontSize="11"
+                       VerticalAlignment="Center" />
+        </Grid>
+
+        <!-- URL row (shown after successful upload) -->
+        <Grid Grid.Row="2" Margin="0,6,0,0" ColumnDefinitions="*,Auto"
+              IsVisible="{Binding UploadedUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <TextBlock Grid.Column="0"
+                       Text="{Binding UploadedUrl}"
+                       Foreground="#FF0078D4" FontSize="11"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="Copy URL"
+                    Command="{Binding CopyUrlCommand}"
+                    Padding="8,4" Margin="6,0,0,0" />
+        </Grid>
     </Grid>
 </Window>
