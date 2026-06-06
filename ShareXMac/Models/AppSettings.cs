@@ -15,4 +15,7 @@ public class AppSettings
     public string ImgurClientId { get; set; } = "";
     public ImageDestination ActiveImageDestination { get; set; } = ImageDestination.Imgur;
     public bool AutoUploadAfterCapture { get; set; } = false;
+
+    // Hotkeys
+    public HotkeySettings Hotkeys { get; set; } = new HotkeySettings();
 }
