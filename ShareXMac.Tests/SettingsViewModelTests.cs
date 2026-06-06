@@ -5,6 +5,84 @@ using Xunit;
 
 namespace ShareXMac.Tests;
 
+public class SettingsViewModelTests
+{
+    [Fact]
+    public void SettingsViewModel_LoadsCurrentValues()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"sharexmac-vm-{Guid.NewGuid():N}.json");
+        try
+        {
+            var svc = new SettingsService(tempFile);
+            svc.Current.SavePath = "/tmp/pics";
+            svc.Current.AutoCopyImage = false;
+
+            var vm = new SettingsViewModel(svc);
+            Assert.Equal("/tmp/pics", vm.SavePath);
+            Assert.False(vm.AutoCopyImage);
+        }
+        finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
+    }
+
+    [Fact]
+    public void SettingsViewModel_SaveCommand_PersistsValues()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"sharexmac-vm2-{Guid.NewGuid():N}.json");
+        try
+        {
+            var svc = new SettingsService(tempFile);
+            var vm = new SettingsViewModel(svc);
+            vm.SavePath = "/tmp/new-path";
+            vm.AutoCopyImage = false;
+            vm.SaveCommand.Execute(null);
+
+            var svc2 = new SettingsService(tempFile);
+            Assert.Equal("/tmp/new-path", svc2.Current.SavePath);
+            Assert.False(svc2.Current.AutoCopyImage);
+        }
+        finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
+    }
+}
+
+public class SettingsViewModelUploadTests
+{
+    [Fact]
+    public void SettingsViewModel_LoadsUploadValues()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"s-up-{Guid.NewGuid():N}.json");
+        try
+        {
+            var svc = new SettingsService(tempFile);
+            svc.Current.ImgurClientId = "myclientid";
+            svc.Current.AutoUploadAfterCapture = true;
+
+            var vm = new SettingsViewModel(svc);
+            Assert.Equal("myclientid", vm.ImgurClientId);
+            Assert.True(vm.AutoUploadAfterCapture);
+        }
+        finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
+    }
+
+    [Fact]
+    public void SettingsViewModel_SaveCommand_PersistsUploadValues()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"s-up2-{Guid.NewGuid():N}.json");
+        try
+        {
+            var svc = new SettingsService(tempFile);
+            var vm = new SettingsViewModel(svc);
+            vm.ImgurClientId = "newid";
+            vm.AutoUploadAfterCapture = true;
+            vm.SaveCommand.Execute(null);
+
+            var svc2 = new SettingsService(tempFile);
+            Assert.Equal("newid", svc2.Current.ImgurClientId);
+            Assert.True(svc2.Current.AutoUploadAfterCapture);
+        }
+        finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
+    }
+}
+
 public class SettingsViewModelHotkeyTests
 {
     private static SettingsService MakeSvc()

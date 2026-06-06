@@ -3,7 +3,7 @@
         xmlns:vm="using:ShareXMac.ViewModels"
         x:Class="ShareXMac.Views.SettingsWindow"
         x:DataType="vm:SettingsViewModel"
-        Width="480" Height="480"
+        Width="480" Height="600"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
         Title="ShareX Mac — Settings">
@@ -55,6 +55,73 @@
             </Grid>
             <TextBlock Text="Imgur anonymous upload requires a free Client ID (no login needed)."
                        FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+
+            <Separator />
+
+            <!-- Hotkeys -->
+            <TextBlock Text="Hotkeys" FontWeight="SemiBold" />
+            <TextBlock Text="Click a field and press a key combo (e.g. Cmd+Shift+1). Clear to disable."
+                       FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+
+            <Grid ColumnDefinitions="130,*,Auto">
+                <TextBlock Grid.Column="0" Text="Capture Region:"
+                           VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" x:Name="CaptureRegionBox"
+                         Text="{Binding CaptureRegionHotkey}"
+                         Watermark="Not set" IsReadOnly="True"
+                         Cursor="Hand" />
+                <Button Grid.Column="2" Content="✕"
+                        Command="{Binding ClearCaptureRegionHotkeyCommand}"
+                        Margin="4,0,0,0" Padding="8,4" />
+            </Grid>
+
+            <Grid ColumnDefinitions="130,*,Auto">
+                <TextBlock Grid.Column="0" Text="Capture Window:"
+                           VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" x:Name="CaptureWindowBox"
+                         Text="{Binding CaptureWindowHotkey}"
+                         Watermark="Not set" IsReadOnly="True"
+                         Cursor="Hand" />
+                <Button Grid.Column="2" Content="✕"
+                        Command="{Binding ClearCaptureWindowHotkeyCommand}"
+                        Margin="4,0,0,0" Padding="8,4" />
+            </Grid>
+
+            <Grid ColumnDefinitions="130,*,Auto">
+                <TextBlock Grid.Column="0" Text="Capture Fullscreen:"
+                           VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" x:Name="CaptureFullscreenBox"
+                         Text="{Binding CaptureFullscreenHotkey}"
+                         Watermark="Not set" IsReadOnly="True"
+                         Cursor="Hand" />
+                <Button Grid.Column="2" Content="✕"
+                        Command="{Binding ClearCaptureFullscreenHotkeyCommand}"
+                        Margin="4,0,0,0" Padding="8,4" />
+            </Grid>
+
+            <Grid ColumnDefinitions="130,*,Auto">
+                <TextBlock Grid.Column="0" Text="Record Video:"
+                           VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" x:Name="RecordVideoBox"
+                         Text="{Binding RecordVideoHotkey}"
+                         Watermark="Not set" IsReadOnly="True"
+                         Cursor="Hand" />
+                <Button Grid.Column="2" Content="✕"
+                        Command="{Binding ClearRecordVideoHotkeyCommand}"
+                        Margin="4,0,0,0" Padding="8,4" />
+            </Grid>
+
+            <Grid ColumnDefinitions="130,*,Auto">
+                <TextBlock Grid.Column="0" Text="Record GIF:"
+                           VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" x:Name="RecordGifBox"
+                         Text="{Binding RecordGifHotkey}"
+                         Watermark="Not set" IsReadOnly="True"
+                         Cursor="Hand" />
+                <Button Grid.Column="2" Content="✕"
+                        Command="{Binding ClearRecordGifHotkeyCommand}"
+                        Margin="4,0,0,0" Padding="8,4" />
+            </Grid>
 
             <Separator />
 
