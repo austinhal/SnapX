@@ -25,10 +25,11 @@ public partial class ColorPickerViewModel : ObservableObject
     // Test constructor: inject a fixed pixel array
     public ColorPickerViewModel(Func<SampledColor[]> sample) => _sample = sample;
 
+    // Must be called on the UI thread — timer callers should use Dispatcher.UIThread.Post.
     public void Refresh()
     {
         SampledColor[] pixels = _sample();
-        int size   = 15;
+        int size   = pixels.Length > 0 ? (int)Math.Round(Math.Sqrt(pixels.Length)) : 15;
         int center = size / 2 * size + size / 2;
         SampledColor c = center < pixels.Length ? pixels[center] : new SampledColor(0, 0, 0);
 
