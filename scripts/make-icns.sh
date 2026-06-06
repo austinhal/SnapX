@@ -10,7 +10,8 @@ TMP_PNG=$(mktemp).png
 
 echo "Generating AppIcon.icns from icon.ico..."
 
-# Extract PNG from ICO using Python (PIL)
+# sips cannot properly convert ICO to PNG format on macOS, so we use minimal Python
+# to extract the largest image from the ICO file as PNG, then process with sips
 python3 << EOF
 from PIL import Image
 ico = Image.open("$SRC_ICO")
@@ -20,8 +21,8 @@ EOF
 rm -rf "$ICONSET_DIR"
 mkdir -p "$ICONSET_DIR"
 
-# Use the extracted PNG as source; largest source icon is 256x256
-# Only use sizes <= 256x256 to avoid upscaling artifacts
+# sips reads PNG and outputs properly formatted PNGs
+# Largest source icon is 256x256; scale up for @2x sizes
 sips -z 16   16   "$TMP_PNG" --out "$ICONSET_DIR/icon_16x16.png"      >/dev/null
 sips -z 32   32   "$TMP_PNG" --out "$ICONSET_DIR/icon_16x16@2x.png"   >/dev/null
 sips -z 32   32   "$TMP_PNG" --out "$ICONSET_DIR/icon_32x32.png"       >/dev/null
@@ -29,9 +30,11 @@ sips -z 64   64   "$TMP_PNG" --out "$ICONSET_DIR/icon_32x32@2x.png"   >/dev/null
 sips -z 128  128  "$TMP_PNG" --out "$ICONSET_DIR/icon_128x128.png"     >/dev/null
 sips -z 256  256  "$TMP_PNG" --out "$ICONSET_DIR/icon_128x128@2x.png" >/dev/null
 sips -z 256  256  "$TMP_PNG" --out "$ICONSET_DIR/icon_256x256.png"     >/dev/null
-sips -z 256  256  "$TMP_PNG" --out "$ICONSET_DIR/icon_256x256@2x.png" >/dev/null
+sips -z 512  512  "$TMP_PNG" --out "$ICONSET_DIR/icon_256x256@2x.png" >/dev/null
+sips -z 512  512  "$TMP_PNG" --out "$ICONSET_DIR/icon_512x512.png"     >/dev/null
+sips -z 512  512  "$TMP_PNG" --out "$ICONSET_DIR/icon_512x512@2x.png" >/dev/null
 
-iconutil -c icns "$ICONSET_DIR" -o "$OUT_ICNS"
+iconutil -c icns -o "$OUT_ICNS" "$ICONSET_DIR"
 rm -rf "$ICONSET_DIR" "$TMP_PNG"
 
 echo "Created: $OUT_ICNS"
