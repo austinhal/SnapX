@@ -9,6 +9,8 @@ APP_DIR="${1:-dist/SnapX.app}"
 IDENTITY="${DEVELOPER_ID:--}"  # default to ad-hoc
 ENTITLEMENTS="ShareXMac/SnapX.entitlements"
 
+[ -d "$APP_DIR" ] || { echo "Error: app bundle not found: $APP_DIR" >&2; exit 1; }
+
 # Resolve to absolute paths
 APP_DIR="$(cd "$(dirname "$APP_DIR")" && pwd)/$(basename "$APP_DIR")"
 ENTITLEMENTS="$(cd "$(dirname "$ENTITLEMENTS")" && pwd)/$(basename "$ENTITLEMENTS")"
@@ -20,7 +22,7 @@ echo "Identity: $IDENTITY"
 # which codesign rejects as "detritus"
 TMP_APP="/tmp/$(basename "$APP_DIR")"
 echo "Copying to $TMP_APP for clean signing environment..."
-rm -rf "$TMP_APP"
+[ -d "$TMP_APP" ] && rm -rf "$TMP_APP"
 ditto "$APP_DIR" "$TMP_APP"
 
 # Strip any quarantine/Finder metadata on the copy

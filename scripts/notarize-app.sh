@@ -6,7 +6,7 @@ set -euo pipefail
 # api-key-path: path to the .p8 App Store Connect API key file
 
 APP_DIR="${1:-dist/SnapX.app}"
-API_KEY_PATH="${2:?AC_API_KEY_PATH must be set}"
+API_KEY_PATH="${2:?API key path argument required (usage: notarize-app.sh [app-path] [api-key-path])}"
 
 ZIP_PATH="${APP_DIR%.app}-notarize.zip"
 
