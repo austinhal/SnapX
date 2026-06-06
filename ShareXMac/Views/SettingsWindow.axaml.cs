@@ -49,8 +49,7 @@ public partial class SettingsWindow : Window
         >= Key.A and <= Key.Z => key.ToString(),
         Key.D0 => "0", Key.D1 => "1", Key.D2 => "2", Key.D3 => "3", Key.D4 => "4",
         Key.D5 => "5", Key.D6 => "6", Key.D7 => "7", Key.D8 => "8", Key.D9 => "9",
-        Key.F1 => "F1", Key.F2 => "F2", Key.F3 => "F3", Key.F4 => "F4",
-        Key.F5 => "F5", Key.F6 => "F6", Key.F7 => "F7", Key.F8 => "F8",
+        >= Key.F1 and <= Key.F12 => key.ToString(),
         _ => null
     };
 }
