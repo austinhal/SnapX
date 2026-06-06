@@ -7,13 +7,14 @@ set -euo pipefail
 
 APP_DIR="${1:-dist/SnapX.app}"
 IDENTITY="${DEVELOPER_ID:--}"  # default to ad-hoc
-ENTITLEMENTS="ShareXMac/SnapX.entitlements"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ENTITLEMENTS="$SCRIPT_DIR/../ShareXMac/SnapX.entitlements"
 
 [ -d "$APP_DIR" ] || { echo "Error: app bundle not found: $APP_DIR" >&2; exit 1; }
+[ -f "$ENTITLEMENTS" ] || { echo "Error: entitlements not found: $ENTITLEMENTS" >&2; exit 1; }
 
-# Resolve to absolute paths
+# Resolve app path to absolute
 APP_DIR="$(cd "$(dirname "$APP_DIR")" && pwd)/$(basename "$APP_DIR")"
-ENTITLEMENTS="$(cd "$(dirname "$ENTITLEMENTS")" && pwd)/$(basename "$ENTITLEMENTS")"
 
 echo "Signing $APP_DIR"
 echo "Identity: $IDENTITY"

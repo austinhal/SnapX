@@ -41,19 +41,30 @@ public class LoginItemService
         Directory.CreateDirectory(Path.GetDirectoryName(PlistPath)!);
         File.WriteAllText(PlistPath, plist);
 
-        RunLaunchctl("load", PlistPath);
+        RunLaunchctl("bootstrap", $"gui/{GetUid()}", PlistPath);
     }
 
     public void Disable()
     {
         if (!File.Exists(PlistPath)) return;
-        RunLaunchctl("unload", PlistPath);
+        RunLaunchctl("bootout", $"gui/{GetUid()}", PlistPath);
         File.Delete(PlistPath);
     }
 
-    private static void RunLaunchctl(string command, string path)
+    private static string GetUid()
     {
-        using var p = Process.Start(new ProcessStartInfo("launchctl", $"{command} {path}")
+        using var p = Process.Start(new ProcessStartInfo("id", "-u")
+        {
+            UseShellExecute = false,
+            RedirectStandardOutput = true
+        })!;
+        p.WaitForExit(2000);
+        return p.StandardOutput.ReadToEnd().Trim();
+    }
+
+    private static void RunLaunchctl(string command, string domain, string path)
+    {
+        using var p = Process.Start(new ProcessStartInfo("launchctl", $"{command} {domain} {path}")
         {
             UseShellExecute = false,
             RedirectStandardError = true

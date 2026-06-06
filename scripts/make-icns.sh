@@ -38,7 +38,7 @@ sips -z 256  256  "$TMP_PNG" --out "$ICONSET_DIR/icon_128x128@2x.png" >/dev/null
 sips -z 256  256  "$TMP_PNG" --out "$ICONSET_DIR/icon_256x256.png"     >/dev/null
 sips -z 512  512  "$TMP_PNG" --out "$ICONSET_DIR/icon_256x256@2x.png" >/dev/null
 sips -z 512  512  "$TMP_PNG" --out "$ICONSET_DIR/icon_512x512.png"     >/dev/null
-sips -z 512  512  "$TMP_PNG" --out "$ICONSET_DIR/icon_512x512@2x.png" >/dev/null
+sips -z 1024 1024 "$TMP_PNG" --out "$ICONSET_DIR/icon_512x512@2x.png" >/dev/null
 
 iconutil -c icns -o "$OUT_ICNS" "$ICONSET_DIR"
 rm -rf "$ICONSET_DIR" "$TMP_PNG"
