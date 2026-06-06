@@ -135,7 +135,7 @@ public partial class TrayViewModel : ObservableObject
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 var result = new CaptureResult(data, path);
-                var vm = new PostCaptureViewModel(result)
+                var vm = new PostCaptureViewModel(result, new UploadService(), _settings.Current)
                 {
                     AutoDismissSeconds = _settings.Current.PostCaptureToolbarTimeoutSeconds
                 };

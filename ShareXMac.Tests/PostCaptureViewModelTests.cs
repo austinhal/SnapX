@@ -1,5 +1,6 @@
 using Avalonia;
 using ShareXMac.Models;
+using ShareXMac.Services;
 using ShareXMac.ViewModels;
 using Xunit;
 
@@ -42,7 +43,7 @@ public class PostCaptureViewModelTests
     public void Constructor_SetsFilePath()
     {
         var result = new CaptureResult(MinimalPng, "/tmp/test.png");
-        var vm = new PostCaptureViewModel(result);
+        var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
         Assert.Equal("/tmp/test.png", vm.FilePath);
     }
 
@@ -50,7 +51,7 @@ public class PostCaptureViewModelTests
     public void Constructor_CreatesThumbnailProperty()
     {
         var result = new CaptureResult(MinimalPng, "/tmp/test.png");
-        var vm = new PostCaptureViewModel(result);
+        var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
         Assert.NotNull(vm.Thumbnail);
     }
 
@@ -58,7 +59,7 @@ public class PostCaptureViewModelTests
     public void DismissCommand_RaisesCloseRequested()
     {
         var result = new CaptureResult(MinimalPng, "/tmp/test.png");
-        var vm = new PostCaptureViewModel(result);
+        var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
         bool raised = false;
         vm.CloseRequested += () => raised = true;
         vm.DismissCommand.Execute(null);
@@ -69,7 +70,32 @@ public class PostCaptureViewModelTests
     public void CopyPathCommand_DoesNotThrow()
     {
         var result = new CaptureResult(MinimalPng, "/tmp/test.png");
-        var vm = new PostCaptureViewModel(result);
+        var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
         vm.CopyPathCommand.Execute(null);
+    }
+
+    [Fact]
+    public void PostCaptureViewModel_WithUploadService_HasUploadCommand()
+    {
+        var result = new CaptureResult(MinimalPng, "/tmp/test.png");
+        var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
+        Assert.NotNull(vm.UploadCommand);
+    }
+
+    [Fact]
+    public void PostCaptureViewModel_InitialState_IsNotUploading()
+    {
+        var result = new CaptureResult(MinimalPng, "/tmp/test.png");
+        var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
+        Assert.False(vm.IsUploading);
+        Assert.Null(vm.UploadedUrl);
+    }
+
+    [Fact]
+    public void PostCaptureViewModel_CopyUrlCommand_NotNull()
+    {
+        var result = new CaptureResult(MinimalPng, "/tmp/test.png");
+        var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
+        Assert.NotNull(vm.CopyUrlCommand);
     }
 }
