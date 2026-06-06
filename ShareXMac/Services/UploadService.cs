@@ -6,7 +6,7 @@ namespace ShareXMac.Services;
 
 public class UploadService
 {
-    public async Task<string?> UploadImageAsync(byte[] data, string fileName, AppSettings settings)
+    public virtual async Task<string?> UploadImageAsync(byte[] data, string fileName, AppSettings settings)
     {
         if (data is null || data.Length == 0) return null;
         if (settings.ActiveImageDestination == ImageDestination.Imgur

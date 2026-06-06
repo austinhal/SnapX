@@ -98,4 +98,36 @@ public class PostCaptureViewModelTests
         var vm = new PostCaptureViewModel(result, new UploadService(), new AppSettings());
         Assert.NotNull(vm.CopyUrlCommand);
     }
+
+    [Fact]
+    public async Task UploadCommand_WhenUploadSucceeds_SetsUploadedUrl()
+    {
+        var result = new CaptureResult(MinimalPng, "/tmp/test.png");
+        var stub = new StubUploadService("https://i.imgur.com/abc123.png");
+        var vm = new PostCaptureViewModel(result, stub, new AppSettings());
+
+        await vm.UploadCommand.ExecuteAsync(null);
+
+        Assert.Equal("https://i.imgur.com/abc123.png", vm.UploadedUrl);
+    }
+
+    [Fact]
+    public async Task UploadCommand_WhenUploadReturnsNull_UploadedUrlRemainsNull()
+    {
+        var result = new CaptureResult(MinimalPng, "/tmp/test.png");
+        var stub = new StubUploadService(null);
+        var vm = new PostCaptureViewModel(result, stub, new AppSettings());
+
+        await vm.UploadCommand.ExecuteAsync(null);
+
+        Assert.Null(vm.UploadedUrl);
+    }
+}
+
+internal sealed class StubUploadService : UploadService
+{
+    private readonly string? _url;
+    public StubUploadService(string? url) { _url = url; }
+    public override Task<string?> UploadImageAsync(byte[] data, string fileName, AppSettings settings)
+        => Task.FromResult(_url);
 }
