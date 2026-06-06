@@ -76,3 +76,8 @@ jobs:
         with:
           files: dist/SnapX-${{ steps.version.outputs.VERSION }}.dmg
           generate_release_notes: true
+
+      - name: Clean up credentials
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/cert.p12" "$RUNNER_TEMP/api_key.p8"
