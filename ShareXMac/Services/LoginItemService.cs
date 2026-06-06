@@ -58,6 +58,6 @@ public class LoginItemService
             UseShellExecute = false,
             RedirectStandardError = true
         });
-        p?.WaitForExit();
+        p?.WaitForExit(5000);
     }
 }

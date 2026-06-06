@@ -65,7 +65,7 @@ public partial class SettingsViewModel : ObservableObject
         if (LaunchAtLogin && !_loginItems.IsEnabled)
         {
             string exe = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName
-                         ?? Path.Combine(AppContext.BaseDirectory, "SnapX");
+                         ?? Path.Combine(AppContext.BaseDirectory, "SnapX.app", "Contents", "MacOS", "SnapX");
             _loginItems.Enable(exe);
         }
         else if (!LaunchAtLogin && _loginItems.IsEnabled)
