@@ -10,6 +10,12 @@ TMP_PNG=$(mktemp).png
 
 echo "Generating AppIcon.icns from icon.ico..."
 
+python3 -c "from PIL import Image" 2>/dev/null || {
+    echo "Error: PIL (Pillow) Python package is required"
+    echo "Install with: pip install Pillow"
+    exit 1
+}
+
 # sips cannot properly convert ICO to PNG format on macOS, so we use minimal Python
 # to extract the largest image from the ICO file as PNG, then process with sips
 python3 << EOF
