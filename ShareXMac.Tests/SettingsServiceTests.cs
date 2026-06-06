@@ -1,3 +1,4 @@
+using ShareX.UploadersLib;
 using ShareXMac.Models;
 using ShareXMac.Services;
 using ShareXMac.ViewModels;
@@ -43,6 +44,15 @@ public class SettingsServiceTests
         string nonexistent = Path.Combine(Path.GetTempPath(), $"no-such-file-{Guid.NewGuid():N}.json");
         var svc = new SettingsService(nonexistent);
         Assert.False(string.IsNullOrEmpty(svc.Current.SavePath));
+    }
+
+    [Fact]
+    public void AppSettings_UploadDefaults_AreCorrect()
+    {
+        var s = new AppSettings();
+        Assert.Equal("", s.ImgurClientId);
+        Assert.Equal(ImageDestination.Imgur, s.ActiveImageDestination);
+        Assert.False(s.AutoUploadAfterCapture);
     }
 }
 
