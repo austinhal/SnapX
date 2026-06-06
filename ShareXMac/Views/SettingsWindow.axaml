@@ -3,39 +3,64 @@
         xmlns:vm="using:ShareXMac.ViewModels"
         x:Class="ShareXMac.Views.SettingsWindow"
         x:DataType="vm:SettingsViewModel"
-        Width="480" Height="320"
+        Width="480" Height="440"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
         Title="ShareX Mac — Settings">
-    <StackPanel Margin="20" Spacing="14">
-        <TextBlock Text="Save Location" FontWeight="SemiBold" />
-        <Grid ColumnDefinitions="*,Auto">
-            <TextBox Grid.Column="0" Text="{Binding SavePath}"
-                     Watermark="/Users/you/Pictures/ShareX Mac" />
-            <Button Grid.Column="1" Content="Browse…"
-                    Command="{Binding BrowseCommand}"
-                    CommandParameter="{Binding $parent[Window]}"
-                    Margin="8,0,0,0" Padding="12,6" />
-        </Grid>
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="14">
 
-        <Separator />
+            <!-- Save location -->
+            <TextBlock Text="Save Location" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0" Text="{Binding SavePath}"
+                         Watermark="/Users/you/Pictures/ShareX Mac" />
+                <Button Grid.Column="1" Content="Browse…"
+                        Command="{Binding BrowseCommand}"
+                        CommandParameter="{Binding $parent[Window]}"
+                        Margin="8,0,0,0" Padding="12,6" />
+            </Grid>
 
-        <CheckBox Content="Copy image to clipboard after capture"
-                  IsChecked="{Binding AutoCopyImage}" />
-        <CheckBox Content="Show post-capture toolbar"
-                  IsChecked="{Binding ShowPostCaptureToolbar}" />
+            <Separator />
 
-        <Grid ColumnDefinitions="Auto,*">
-            <TextBlock Grid.Column="0" Text="Toolbar timeout (seconds):"
-                       VerticalAlignment="Center" Margin="0,0,8,0" />
-            <NumericUpDown Grid.Column="1" Value="{Binding PostCaptureTimeoutSeconds}"
-                           Minimum="2" Maximum="60" Width="80" HorizontalAlignment="Left" />
-        </Grid>
+            <!-- Capture behavior -->
+            <TextBlock Text="After Capture" FontWeight="SemiBold" />
+            <CheckBox Content="Copy image to clipboard after capture"
+                      IsChecked="{Binding AutoCopyImage}" />
+            <CheckBox Content="Show post-capture toolbar"
+                      IsChecked="{Binding ShowPostCaptureToolbar}" />
+            <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0" Text="Toolbar timeout (seconds):"
+                           VerticalAlignment="Center" Margin="0,0,8,0" />
+                <NumericUpDown Grid.Column="1" Value="{Binding PostCaptureTimeoutSeconds}"
+                               Minimum="2" Maximum="60" Width="80" HorizontalAlignment="Left" />
+            </Grid>
 
-        <Separator />
+            <Separator />
 
-        <Button Content="Save" Command="{Binding SaveCommand}"
-                HorizontalAlignment="Right" Background="#FF0078D4"
-                Foreground="White" Padding="16,8" />
-    </StackPanel>
+            <!-- Upload -->
+            <TextBlock Text="Upload" FontWeight="SemiBold" />
+            <CheckBox Content="Auto-upload after capture"
+                      IsChecked="{Binding AutoUploadAfterCapture}" />
+            <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0" Text="Destination:"
+                           VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBlock Grid.Column="1" Text="Imgur" VerticalAlignment="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0" Text="Imgur Client ID:"
+                           VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBox Grid.Column="1" Text="{Binding ImgurClientId}"
+                         Watermark="Register free at api.imgur.com/oauth2/addclient" />
+            </Grid>
+            <TextBlock Text="Imgur anonymous upload requires a free Client ID (no login needed)."
+                       FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+
+            <Separator />
+
+            <Button Content="Save" Command="{Binding SaveCommand}"
+                    HorizontalAlignment="Right" Background="#FF0078D4"
+                    Foreground="White" Padding="16,8" />
+        </StackPanel>
+    </ScrollViewer>
 </Window>

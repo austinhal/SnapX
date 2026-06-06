@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ShareX.UploadersLib;
 using ShareXMac.Services;
 
 namespace ShareXMac.ViewModels;
@@ -12,6 +13,9 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _autoCopyImage;
     [ObservableProperty] private bool _showPostCaptureToolbar;
     [ObservableProperty] private int _postCaptureTimeoutSeconds;
+    [ObservableProperty] private string _imgurClientId = "";
+    [ObservableProperty] private ImageDestination _activeImageDestination;
+    [ObservableProperty] private bool _autoUploadAfterCapture;
 
     public event Action? CloseRequested;
 
@@ -23,6 +27,9 @@ public partial class SettingsViewModel : ObservableObject
         AutoCopyImage = s.AutoCopyImage;
         ShowPostCaptureToolbar = s.ShowPostCaptureToolbar;
         PostCaptureTimeoutSeconds = s.PostCaptureToolbarTimeoutSeconds;
+        ImgurClientId = s.ImgurClientId;
+        ActiveImageDestination = s.ActiveImageDestination;
+        AutoUploadAfterCapture = s.AutoUploadAfterCapture;
     }
 
     [RelayCommand]
@@ -46,6 +53,9 @@ public partial class SettingsViewModel : ObservableObject
         _service.Current.AutoCopyImage = AutoCopyImage;
         _service.Current.ShowPostCaptureToolbar = ShowPostCaptureToolbar;
         _service.Current.PostCaptureToolbarTimeoutSeconds = PostCaptureTimeoutSeconds;
+        _service.Current.ImgurClientId = ImgurClientId;
+        _service.Current.ActiveImageDestination = ActiveImageDestination;
+        _service.Current.AutoUploadAfterCapture = AutoUploadAfterCapture;
         _service.Save();
         CloseRequested?.Invoke();
     }

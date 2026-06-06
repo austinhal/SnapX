@@ -94,3 +94,42 @@ public class SettingsViewModelTests
         finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
     }
 }
+
+public class SettingsViewModelUploadTests
+{
+    [Fact]
+    public void SettingsViewModel_LoadsUploadValues()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"s-up-{Guid.NewGuid():N}.json");
+        try
+        {
+            var svc = new SettingsService(tempFile);
+            svc.Current.ImgurClientId = "myclientid";
+            svc.Current.AutoUploadAfterCapture = true;
+
+            var vm = new SettingsViewModel(svc);
+            Assert.Equal("myclientid", vm.ImgurClientId);
+            Assert.True(vm.AutoUploadAfterCapture);
+        }
+        finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
+    }
+
+    [Fact]
+    public void SettingsViewModel_SaveCommand_PersistsUploadValues()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"s-up2-{Guid.NewGuid():N}.json");
+        try
+        {
+            var svc = new SettingsService(tempFile);
+            var vm = new SettingsViewModel(svc);
+            vm.ImgurClientId = "newid";
+            vm.AutoUploadAfterCapture = true;
+            vm.SaveCommand.Execute(null);
+
+            var svc2 = new SettingsService(tempFile);
+            Assert.Equal("newid", svc2.Current.ImgurClientId);
+            Assert.True(svc2.Current.AutoUploadAfterCapture);
+        }
+        finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
+    }
+}
