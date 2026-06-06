@@ -14,12 +14,14 @@ public record SampledColor(byte R, byte G, byte B)
         double h = 0;
         if (delta > 0)
         {
-            if (max == rf)       h = 60 * ((gf - bf) / delta % 6);
+            if (max == rf)       h = 60 * (gf - bf) / delta;
             else if (max == gf)  h = 60 * ((bf - rf) / delta + 2);
             else                 h = 60 * ((rf - gf) / delta + 4);
-            if (h < 0) h += 360;
+            h = ((h % 360) + 360) % 360;
         }
         double s = max == 0 ? 0 : delta / max;
-        return (Math.Round(h), Math.Round(s * 100), Math.Round(max * 100));
+        return (Math.Round(h, MidpointRounding.AwayFromZero),
+                Math.Round(s * 100, MidpointRounding.AwayFromZero),
+                Math.Round(max * 100, MidpointRounding.AwayFromZero));
     }
 }

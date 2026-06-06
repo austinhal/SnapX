@@ -55,4 +55,35 @@ public class SampledColorTests
         var (h, s, v) = new SampledColor(0, 0, 255).ToHsv();
         Assert.Equal(240, h); Assert.Equal(100, s); Assert.Equal(100, v);
     }
+
+    [Fact]
+    public void ToHsv_Yellow_Hue60()
+    {
+        var (h, s, v) = new SampledColor(255, 255, 0).ToHsv();
+        Assert.Equal(60, h); Assert.Equal(100, s); Assert.Equal(100, v);
+    }
+
+    [Fact]
+    public void ToHsv_Cyan_Hue180()
+    {
+        var (h, s, v) = new SampledColor(0, 255, 255).ToHsv();
+        Assert.Equal(180, h); Assert.Equal(100, s); Assert.Equal(100, v);
+    }
+
+    [Fact]
+    public void ToHsv_Magenta_Hue300()
+    {
+        var (h, s, v) = new SampledColor(255, 0, 255).ToHsv();
+        Assert.Equal(300, h); Assert.Equal(100, s); Assert.Equal(100, v);
+    }
+
+    [Fact]
+    public void ToHsv_NearBoundaryRed_HueNotWrapsTo360()
+    {
+        // (255, 1, 0) is red-dominant — hue should round to 0, not 360
+        var (h, s, v) = new SampledColor(255, 1, 0).ToHsv();
+        Assert.True(h < 360, $"Expected h < 360 but got {h}");
+        Assert.Equal(100, s);
+        Assert.Equal(100, v);
+    }
 }
