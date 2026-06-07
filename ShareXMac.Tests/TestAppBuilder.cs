@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Headless;
+using Xunit;
 
 [assembly: Avalonia.Headless.AvaloniaTestApplication(typeof(ShareXMac.Tests.TestAppBuilder))]
 
@@ -12,31 +13,23 @@ public class TestAppBuilder
             .UseHeadless(new AvaloniaHeadlessPlatformOptions());
 }
 
-/// <summary>
-/// xUnit class fixture that initialises the Avalonia headless platform once per test class.
-/// Use with <c>[Collection(nameof(HeadlessAvaloniaFixture))]</c> or as a
-/// <c>IClassFixture&lt;HeadlessAvaloniaFixture&gt;</c> on any test class that creates
-/// Avalonia bitmaps / platform objects from plain [Fact] tests.
-/// </summary>
+// All test classes that create Avalonia objects must belong to this collection.
+// xUnit runs all classes in the same collection on the same thread sequentially,
+// which prevents "Call from invalid thread" when multiple fixtures bind the dispatcher.
+[CollectionDefinition(nameof(HeadlessAvaloniaFixture))]
+public class HeadlessAvaloniaCollection : ICollectionFixture<HeadlessAvaloniaFixture> { }
+
 public sealed class HeadlessAvaloniaFixture
 {
-    private static readonly object _lock = new();
-    private static bool _initialized;
-
     public HeadlessAvaloniaFixture()
     {
-        lock (_lock)
+        try
         {
-            if (_initialized) return;
-            try
-            {
-                TestAppBuilder.BuildAvaloniaApp().SetupWithoutStarting();
-            }
-            catch
-            {
-                // Already initialised by a previous fixture or [AvaloniaTestApplication].
-            }
-            _initialized = true;
+            TestAppBuilder.BuildAvaloniaApp().SetupWithoutStarting();
+        }
+        catch
+        {
+            // Already initialised by [AvaloniaTestApplication] or a prior run.
         }
     }
 }

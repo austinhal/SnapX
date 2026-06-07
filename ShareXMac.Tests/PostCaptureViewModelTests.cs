@@ -1,4 +1,3 @@
-using Avalonia;
 using ShareXMac.Models;
 using ShareXMac.Services;
 using ShareXMac.ViewModels;
@@ -6,23 +5,9 @@ using Xunit;
 
 namespace ShareXMac.Tests;
 
+[Collection(nameof(HeadlessAvaloniaFixture))]
 public class PostCaptureViewModelTests
 {
-    private static readonly Lazy<bool> AvaloniaInitialized = new Lazy<bool>(() =>
-    {
-        try
-        {
-            AppBuilder.Configure<Application>()
-                .UsePlatformDetect()
-                .SetupWithoutStarting();
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    });
-
     // Minimal 1x1 white PNG
     private static readonly byte[] MinimalPng = new byte[]
     {
@@ -33,11 +18,6 @@ public class PostCaptureViewModelTests
         0x00,0x05,0xFE,0x02,0xFE,0x0D,0xEF,0x46,0xB8,0x00,0x00,0x00,
         0x00,0x49,0x45,0x4E,0x44,0xAE,0x42,0x60,0x82
     };
-
-    public PostCaptureViewModelTests()
-    {
-        _ = AvaloniaInitialized.Value;
-    }
 
     [Fact]
     public void Constructor_SetsFilePath()

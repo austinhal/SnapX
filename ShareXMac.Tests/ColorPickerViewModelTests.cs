@@ -4,7 +4,8 @@ using Xunit;
 
 namespace ShareXMac.Tests;
 
-public class ColorPickerViewModelTests : IClassFixture<HeadlessAvaloniaFixture>
+[Collection(nameof(HeadlessAvaloniaFixture))]
+public class ColorPickerViewModelTests
 {
     private static SampledColor[] AllColor(byte r, byte g, byte b)
         => Enumerable.Repeat(new SampledColor(r, g, b), 15 * 15).ToArray();

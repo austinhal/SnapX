@@ -7,7 +7,8 @@ namespace ShareXMac.Tests;
 
 // HeadlessAvaloniaFixture (defined in TestAppBuilder.cs) initialises Avalonia before tests,
 // which is required to construct Bitmap objects in AnnotationEditorViewModel.
-public class AnnotationEditorViewModelTests : IClassFixture<HeadlessAvaloniaFixture>
+[Collection(nameof(HeadlessAvaloniaFixture))]
+public class AnnotationEditorViewModelTests
 {
     // Minimal 1×1 white PNG
     private static readonly byte[] MinimalPng =
