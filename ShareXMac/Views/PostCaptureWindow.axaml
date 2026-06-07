@@ -30,6 +30,10 @@
             <Button Content="Open in Finder"
                     Command="{Binding OpenInFinderCommand}"
                     Padding="10,5" />
+            <Button Content="Annotate"
+                    Command="{Binding AnnotateCommand}"
+                    Background="#FF6B2FBE" Foreground="White"
+                    Padding="10,5" />
             <Button Content="Upload"
                     Command="{Binding UploadCommand}"
                     IsEnabled="{Binding !IsUploading}"
