@@ -9,9 +9,9 @@ public class AnnotationLayer
 
     public event Action? Changed;
 
-    public void Add(Annotation a)
+    public void Add(Annotation annotation)
     {
-        _items.Add(a);
+        _items.Add(annotation);
         Changed?.Invoke();
     }
 
@@ -25,6 +25,7 @@ public class AnnotationLayer
 
     public void Clear()
     {
+        if (_items.Count == 0) return;
         _items.Clear();
         Changed?.Invoke();
     }
