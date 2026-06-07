@@ -56,7 +56,7 @@ public partial class PostCaptureViewModel : ObservableObject, IDisposable
             editorVm.Completed += bytes =>
             {
                 _imageData = bytes;
-                var old = _thumbnail;
+                var old = Thumbnail;
                 using var ms = new MemoryStream(bytes);
                 Thumbnail = Bitmap.DecodeToWidth(ms, 360);
                 old?.Dispose();

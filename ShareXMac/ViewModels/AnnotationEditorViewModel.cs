@@ -12,7 +12,7 @@ public partial class AnnotationEditorViewModel : ObservableObject
     private Point? _dragStart;
 
     [ObservableProperty] private AnnotationTool _currentTool = AnnotationTool.Arrow;
-    [ObservableProperty] private string         _currentColor = "#FF0000";
+    [ObservableProperty] private string         _currentColor = "#FFFF0000";
     [ObservableProperty] private double         _strokeWidth  = 3;
     [ObservableProperty] private Annotation?    _inProgressAnnotation;
 
