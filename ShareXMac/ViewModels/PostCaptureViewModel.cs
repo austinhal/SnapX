@@ -61,7 +61,6 @@ public partial class PostCaptureViewModel : ObservableObject, IDisposable
                 Thumbnail = Bitmap.DecodeToWidth(ms, 360);
                 old?.Dispose();
             };
-            editorVm.CancelRequested += editorWin.Close;
             editorWin.Show();
         });
     }
