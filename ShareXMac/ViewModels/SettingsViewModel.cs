@@ -26,6 +26,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _captureFullscreenHotkey = "";
     [ObservableProperty] private string _recordVideoHotkey = "";
     [ObservableProperty] private string _recordGifHotkey = "";
+    [ObservableProperty] private string _ocrTextHotkey = "";
 
     public event Action? CloseRequested;
 
@@ -49,6 +50,7 @@ public partial class SettingsViewModel : ObservableObject
         CaptureFullscreenHotkey = KeyComboHelper.ToString(h.CaptureFullscreen);
         RecordVideoHotkey       = KeyComboHelper.ToString(h.RecordVideo);
         RecordGifHotkey         = KeyComboHelper.ToString(h.RecordGif);
+        OcrTextHotkey           = KeyComboHelper.ToString(h.OcrText);
     }
 
     [RelayCommand]
@@ -70,6 +72,7 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand] private void ClearCaptureFullscreenHotkey() => CaptureFullscreenHotkey = "";
     [RelayCommand] private void ClearRecordVideoHotkey()      => RecordVideoHotkey = "";
     [RelayCommand] private void ClearRecordGifHotkey()        => RecordGifHotkey = "";
+    [RelayCommand] private void ClearOcrTextHotkey()          => OcrTextHotkey = "";
 
     [RelayCommand]
     private void Save()
@@ -87,6 +90,7 @@ public partial class SettingsViewModel : ObservableObject
         _service.Current.Hotkeys.CaptureFullscreen = KeyComboHelper.Parse(CaptureFullscreenHotkey);
         _service.Current.Hotkeys.RecordVideo       = KeyComboHelper.Parse(RecordVideoHotkey);
         _service.Current.Hotkeys.RecordGif         = KeyComboHelper.Parse(RecordGifHotkey);
+        _service.Current.Hotkeys.OcrText           = KeyComboHelper.Parse(OcrTextHotkey);
 
         _service.Save();
 

@@ -151,4 +151,40 @@ public class SettingsViewModelHotkeyTests
         Assert.Equal("Cmd+Shift+5", vm.RecordVideoHotkey);
         Assert.Equal("Cmd+Shift+6", vm.RecordGifHotkey);
     }
+
+    [Fact]
+    public void SettingsViewModel_LoadsEmptyOcrTextHotkey_WhenNotConfigured()
+    {
+        var vm = new SettingsViewModel(MakeSvc());
+        Assert.Equal("", vm.OcrTextHotkey);
+    }
+
+    [Fact]
+    public void SettingsViewModel_LoadsOcrTextHotkey_FromSettings()
+    {
+        var svc = MakeSvc();
+        svc.Current.Hotkeys.OcrText = new KeyCombo("Cmd+Shift", "T");
+        var vm = new SettingsViewModel(svc);
+        Assert.Equal("Cmd+Shift+T", vm.OcrTextHotkey);
+    }
+
+    [Fact]
+    public void SettingsViewModel_SavesOcrTextHotkey_ToSettings()
+    {
+        var svc = MakeSvc();
+        var vm = new SettingsViewModel(svc);
+        vm.OcrTextHotkey = "Cmd+T";
+        vm.SaveCommand.Execute(null);
+        Assert.Equal(new KeyCombo("Cmd", "T"), svc.Current.Hotkeys.OcrText);
+    }
+
+    [Fact]
+    public void SettingsViewModel_ClearOcrTextHotkeyCommand_SetsEmpty()
+    {
+        var svc = MakeSvc();
+        svc.Current.Hotkeys.OcrText = new KeyCombo("Cmd", "T");
+        var vm = new SettingsViewModel(svc);
+        vm.ClearOcrTextHotkeyCommand.Execute(null);
+        Assert.Equal("", vm.OcrTextHotkey);
+    }
 }

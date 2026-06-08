@@ -19,6 +19,7 @@ public partial class SettingsWindow : Window
         this.FindControl<TextBox>("CaptureFullscreenBox")!.KeyDown += (_, e) => OnHotkeyKeyDown(e, v => vm.CaptureFullscreenHotkey = v);
         this.FindControl<TextBox>("RecordVideoBox")!.KeyDown      += (_, e) => OnHotkeyKeyDown(e, v => vm.RecordVideoHotkey = v);
         this.FindControl<TextBox>("RecordGifBox")!.KeyDown        += (_, e) => OnHotkeyKeyDown(e, v => vm.RecordGifHotkey = v);
+        this.FindControl<TextBox>("OcrTextBox")!.KeyDown          += (_, e) => OnHotkeyKeyDown(e, v => vm.OcrTextHotkey = v);
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

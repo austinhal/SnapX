@@ -123,6 +123,18 @@
                         Margin="4,0,0,0" Padding="8,4" />
             </Grid>
 
+            <Grid ColumnDefinitions="130,*,Auto">
+                <TextBlock Grid.Column="0" Text="Capture Text (OCR):"
+                           VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" x:Name="OcrTextBox"
+                         Text="{Binding OcrTextHotkey}"
+                         Watermark="Not set" IsReadOnly="True"
+                         Cursor="Hand" />
+                <Button Grid.Column="2" Content="✕"
+                        Command="{Binding ClearOcrTextHotkeyCommand}"
+                        Margin="4,0,0,0" Padding="8,4" />
+            </Grid>
+
             <Separator />
 
             <!-- System -->
