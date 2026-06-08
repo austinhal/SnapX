@@ -9,4 +9,5 @@ public class HotkeySettings
     public KeyCombo? CaptureFullscreen { get; set; }
     public KeyCombo? RecordVideo { get; set; }
     public KeyCombo? RecordGif { get; set; }
+    public KeyCombo? OcrText { get; set; }
 }

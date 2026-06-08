@@ -54,6 +54,17 @@ public class TrayViewModelTests
             if (File.Exists(historyFile)) File.Delete(historyFile);
         }
     }
+    [Fact]
+    public void TrayViewModel_CaptureTextOcrCommand_IsNotNull()
+    {
+        var vm = new TrayViewModel(
+            new StubScreenCapture(),
+            new SettingsService(Path.GetTempFileName()),
+            new HistoryService(Path.GetTempFileName()),
+            new UploadService(),
+            new StubHotkeyManager());
+        Assert.NotNull(vm.CaptureTextOcrCommand);
+    }
 }
 
 public class StubHotkeyManager : IHotkeyManager

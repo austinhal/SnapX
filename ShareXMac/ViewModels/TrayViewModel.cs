@@ -19,6 +19,7 @@ public partial class TrayViewModel : ObservableObject
     private readonly HistoryService _history;
     private readonly UploadService _upload;
     private readonly IHotkeyManager _hotkeyManager;
+    private readonly OcrService _ocr;
 
     [ObservableProperty] private bool _isRecording;
 
@@ -37,6 +38,7 @@ public partial class TrayViewModel : ObservableObject
         _history      = history;
         _upload       = upload;
         _hotkeyManager = hotkeyManager;
+        _ocr = new OcrService(_capture);
         settings.Saved += RegisterHotkeys;
         RegisterHotkeys();
     }
@@ -56,6 +58,7 @@ public partial class TrayViewModel : ObservableObject
         RegisterHotkey("capture-fullscreen", h.CaptureFullscreen, CaptureFullscreen);
         RegisterHotkey("record-video",       h.RecordVideo,      RecordVideo);
         RegisterHotkey("record-gif",         h.RecordGif,        RecordGif);
+        RegisterHotkey("ocr-text",           h.OcrText,          CaptureTextOcr);
     }
 
     private void RegisterHotkey(string id, KeyCombo? combo, Func<Task> action)
@@ -120,6 +123,18 @@ public partial class TrayViewModel : ObservableObject
             await _capture.StartRecordingAsync(path, RecordingFormat.GIF);
             IsRecording = true;
         }
+    }
+
+    [RelayCommand]
+    private async Task CaptureTextOcr()
+    {
+        string? text = await _ocr.CaptureAndRecognizeAsync();
+        if (string.IsNullOrWhiteSpace(text)) return;
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            var vm = new OcrResultViewModel(text);
+            new OcrResultWindow(vm).Show();
+        });
     }
 
     [RelayCommand]
