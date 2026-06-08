@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ShareXMac.ViewModels"
+        x:Class="ShareXMac.Views.OcrResultWindow"
+        x:DataType="vm:OcrResultViewModel"
+        Width="400" Height="240"
+        CanResize="False"
+        SystemDecorations="BorderOnly"
+        WindowStartupLocation="CenterScreen"
+        Title="ShareX Mac — OCR Result"
+        Background="#FF1E1E1E">
+    <StackPanel Margin="12" Spacing="8">
+
+        <TextBlock Text="Recognized Text"
+                   FontWeight="SemiBold" Foreground="#FFDDDDDD" />
+
+        <TextBox x:Name="TextResult"
+                 Text="{Binding RecognizedText}"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 Height="140"
+                 Background="#FF2D2D2D"
+                 Foreground="#FFDDDDDD"
+                 BorderThickness="1"
+                 BorderBrush="#FF444444" />
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="6">
+            <Button Content="Copy &amp; Close"
+                    Command="{Binding CopyCommand}"
+                    Background="#FF0078D4" Foreground="White"
+                    Padding="12,5" />
+            <Button Content="Dismiss"
+                    Command="{Binding DismissCommand}"
+                    Padding="12,5" />
+        </StackPanel>
+
+    </StackPanel>
+</Window>
