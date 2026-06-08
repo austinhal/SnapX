@@ -12,7 +12,8 @@ public class TrayViewModelRecordingTests
         new SettingsService(Path.GetTempFileName()),
         new HistoryService(Path.GetTempFileName()),
         new UploadService(),
-        new StubHotkeyManager());
+        new StubHotkeyManager(),
+        new OcrService(new StubScreenCapture()));
 
     [Fact]
     public void IsRecording_DefaultsFalse()

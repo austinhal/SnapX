@@ -23,8 +23,9 @@ public partial class App : Application
         var capture       = new MacScreenCapture();
         var upload        = new UploadService();
         var hotkeyManager = new MacHotkeyManager();
+        var ocr           = new OcrService(capture);
 
-        DataContext = new TrayViewModel(capture, settings, history, upload, hotkeyManager);
+        DataContext = new TrayViewModel(capture, settings, history, upload, hotkeyManager, ocr);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnExplicitShutdown;

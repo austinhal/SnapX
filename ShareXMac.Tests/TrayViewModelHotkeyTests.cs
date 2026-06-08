@@ -16,7 +16,8 @@ public class TrayViewModelHotkeyTests
         var vm = new TrayViewModel(
             new StubScreenCapture(), svc,
             new HistoryService(Path.Combine(Path.GetTempPath(), $"h-{Guid.NewGuid():N}.json")),
-            new UploadService(), hotkeys);
+            new UploadService(), hotkeys,
+            new OcrService(new StubScreenCapture()));
         return (vm, hotkeys, svc);
     }
 

@@ -31,14 +31,15 @@ public partial class TrayViewModel : ObservableObject
         SettingsService settings,
         HistoryService history,
         UploadService upload,
-        IHotkeyManager hotkeyManager)
+        IHotkeyManager hotkeyManager,
+        OcrService ocr)
     {
         _capture      = capture;
         _settings     = settings;
         _history      = history;
         _upload       = upload;
         _hotkeyManager = hotkeyManager;
-        _ocr = new OcrService(_capture);
+        _ocr = ocr;
         settings.Saved += RegisterHotkeys;
         RegisterHotkeys();
     }
@@ -128,13 +129,20 @@ public partial class TrayViewModel : ObservableObject
     [RelayCommand]
     private async Task CaptureTextOcr()
     {
-        string? text = await _ocr.CaptureAndRecognizeAsync();
-        if (string.IsNullOrWhiteSpace(text)) return;
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        try
         {
-            var vm = new OcrResultViewModel(text);
-            new OcrResultWindow(vm).Show();
-        });
+            string? text = await _ocr.CaptureAndRecognizeAsync();
+            if (string.IsNullOrWhiteSpace(text)) return;
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                var vm = new OcrResultViewModel(text);
+                new OcrResultWindow(vm).Show();
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OCR failed: {ex.Message}");
+        }
     }
 
     [RelayCommand]

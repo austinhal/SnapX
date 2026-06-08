@@ -16,6 +16,8 @@
                                         Command="{Binding CaptureWindowCommand}" />
                         <NativeMenuItem Header="Capture Fullscreen"
                                         Command="{Binding CaptureFullscreenCommand}" />
+                        <NativeMenuItem Header="Capture Text (OCR)"
+                                        Command="{Binding CaptureTextOcrCommand}" />
                         <NativeMenuItemSeparator />
                         <NativeMenuItem Header="{Binding RecordVideoHeader}"
                                         Command="{Binding RecordVideoCommand}" />
@@ -24,8 +26,6 @@
                         <NativeMenuItemSeparator />
                         <NativeMenuItem Header="Color Picker"
                                         Command="{Binding OpenColorPickerCommand}" />
-                        <NativeMenuItem Header="Capture Text (OCR)"
-                                        Command="{Binding CaptureTextOcrCommand}" />
                         <NativeMenuItemSeparator />
                         <NativeMenuItem Header="Settings..."
                                         Command="{Binding OpenSettingsCommand}" />
