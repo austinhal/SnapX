@@ -1,4 +1,5 @@
 using ShareX.HelpersLib;
+using ShareXMac.Models;
 using ShareXMac.Services;
 using ShareXMac.ViewModels;
 using Xunit;
@@ -8,24 +9,21 @@ namespace ShareXMac.Tests;
 public class SettingsViewModelTests
 {
     [Fact]
-    public void SettingsViewModel_LoadsCurrentValues()
+    public void SettingsViewModel_LoadsSavePath()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"sharexmac-vm-{Guid.NewGuid():N}.json");
         try
         {
             var svc = new SettingsService(tempFile);
             svc.Current.SavePath = "/tmp/pics";
-            svc.Current.AutoCopyImage = false;
-
             var vm = new SettingsViewModel(svc);
             Assert.Equal("/tmp/pics", vm.SavePath);
-            Assert.False(vm.AutoCopyImage);
         }
         finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
     }
 
     [Fact]
-    public void SettingsViewModel_SaveCommand_PersistsValues()
+    public void SettingsViewModel_SaveCommand_PersistsSavePath()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"sharexmac-vm2-{Guid.NewGuid():N}.json");
         try
@@ -33,12 +31,9 @@ public class SettingsViewModelTests
             var svc = new SettingsService(tempFile);
             var vm = new SettingsViewModel(svc);
             vm.SavePath = "/tmp/new-path";
-            vm.AutoCopyImage = false;
             vm.SaveCommand.Execute(null);
-
             var svc2 = new SettingsService(tempFile);
             Assert.Equal("/tmp/new-path", svc2.Current.SavePath);
-            Assert.False(svc2.Current.AutoCopyImage);
         }
         finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
     }
@@ -47,24 +42,21 @@ public class SettingsViewModelTests
 public class SettingsViewModelUploadTests
 {
     [Fact]
-    public void SettingsViewModel_LoadsUploadValues()
+    public void SettingsViewModel_LoadsImgurClientId()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"s-up-{Guid.NewGuid():N}.json");
         try
         {
             var svc = new SettingsService(tempFile);
             svc.Current.ImgurClientId = "myclientid";
-            svc.Current.AutoUploadAfterCapture = true;
-
             var vm = new SettingsViewModel(svc);
             Assert.Equal("myclientid", vm.ImgurClientId);
-            Assert.True(vm.AutoUploadAfterCapture);
         }
         finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
     }
 
     [Fact]
-    public void SettingsViewModel_SaveCommand_PersistsUploadValues()
+    public void SettingsViewModel_SaveCommand_PersistsImgurClientId()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"s-up2-{Guid.NewGuid():N}.json");
         try
@@ -72,12 +64,9 @@ public class SettingsViewModelUploadTests
             var svc = new SettingsService(tempFile);
             var vm = new SettingsViewModel(svc);
             vm.ImgurClientId = "newid";
-            vm.AutoUploadAfterCapture = true;
             vm.SaveCommand.Execute(null);
-
             var svc2 = new SettingsService(tempFile);
             Assert.Equal("newid", svc2.Current.ImgurClientId);
-            Assert.True(svc2.Current.AutoUploadAfterCapture);
         }
         finally { if (File.Exists(tempFile)) File.Delete(tempFile); }
     }
@@ -186,5 +175,99 @@ public class SettingsViewModelHotkeyTests
         var vm = new SettingsViewModel(svc);
         vm.ClearOcrTextHotkeyCommand.Execute(null);
         Assert.Equal("", vm.OcrTextHotkey);
+    }
+}
+
+public class SettingsViewModelWorkflowTests
+{
+    private static SettingsService MakeSvc()
+        => new SettingsService(Path.Combine(Path.GetTempPath(), $"s-wf-{Guid.NewGuid():N}.json"));
+
+    [Fact]
+    public void SettingsViewModel_LoadsWorkflowGlobalDefaults()
+    {
+        var svc = MakeSvc();
+        svc.Current.Workflow.ShowToolbar   = false;
+        svc.Current.Workflow.AutoCopyImage = false;
+        svc.Current.Workflow.AutoUpload    = true;
+
+        var vm = new SettingsViewModel(svc);
+        Assert.False(vm.WfShowToolbar);
+        Assert.False(vm.WfAutoCopyImage);
+        Assert.True(vm.WfAutoUpload);
+    }
+
+    [Fact]
+    public void SettingsViewModel_LoadsWorkflowOverride_NullWhenNotSet()
+    {
+        var vm = new SettingsViewModel(MakeSvc());
+        Assert.Null(vm.WfRegionShowToolbar);
+        Assert.Null(vm.WfWindowAutoCopyImage);
+        Assert.Null(vm.WfFullscreenAutoUpload);
+    }
+
+    [Fact]
+    public void SettingsViewModel_LoadsWorkflowOverride_WhenSet()
+    {
+        var svc = MakeSvc();
+        svc.Current.Workflow.FullscreenOverride.AutoUpload    = true;
+        svc.Current.Workflow.FullscreenOverride.ShowToolbar   = false;
+
+        var vm = new SettingsViewModel(svc);
+        Assert.True(vm.WfFullscreenAutoUpload);
+        Assert.False(vm.WfFullscreenShowToolbar);
+    }
+
+    [Fact]
+    public void SettingsViewModel_Save_PersistsGlobalDefaults()
+    {
+        var svc = MakeSvc();
+        var vm = new SettingsViewModel(svc);
+        vm.WfShowToolbar   = false;
+        vm.WfAutoUpload    = true;
+        vm.WfSaveFolder    = "/custom";
+        vm.SaveCommand.Execute(null);
+
+        Assert.False(svc.Current.Workflow.ShowToolbar);
+        Assert.True(svc.Current.Workflow.AutoUpload);
+        Assert.Equal("/custom", svc.Current.Workflow.SaveFolder);
+    }
+
+    [Fact]
+    public void SettingsViewModel_Save_PersistsPerTypeOverride()
+    {
+        var svc = MakeSvc();
+        var vm = new SettingsViewModel(svc);
+        vm.WfRegionAutoUpload   = true;
+        vm.WfRegionSaveFolder   = "/region-folder";
+        vm.SaveCommand.Execute(null);
+
+        Assert.True(svc.Current.Workflow.RegionOverride.AutoUpload);
+        Assert.Equal("/region-folder", svc.Current.Workflow.RegionOverride.SaveFolder);
+    }
+
+    [Fact]
+    public void SettingsViewModel_Save_NullForEmptyOverride()
+    {
+        var svc = MakeSvc();
+        svc.Current.Workflow.RegionOverride.ShowToolbar = true;
+        var vm = new SettingsViewModel(svc);
+        vm.WfRegionShowToolbar = null;
+        vm.WfRegionSaveFolder  = "";
+        vm.SaveCommand.Execute(null);
+
+        Assert.Null(svc.Current.Workflow.RegionOverride.ShowToolbar);
+        Assert.Null(svc.Current.Workflow.RegionOverride.SaveFolder);
+    }
+
+    [Fact]
+    public void SettingsViewModel_Save_NullWfSaveFolder_WhenEmpty()
+    {
+        var svc = MakeSvc();
+        svc.Current.Workflow.SaveFolder = "/old";
+        var vm = new SettingsViewModel(svc);
+        vm.WfSaveFolder = "";
+        vm.SaveCommand.Execute(null);
+        Assert.Null(svc.Current.Workflow.SaveFolder);
     }
 }

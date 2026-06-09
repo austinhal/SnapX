@@ -3,150 +3,261 @@
         xmlns:vm="using:ShareXMac.ViewModels"
         x:Class="ShareXMac.Views.SettingsWindow"
         x:DataType="vm:SettingsViewModel"
-        Width="480" Height="600"
+        Width="520" Height="640"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
         Title="ShareX Mac — Settings">
-    <ScrollViewer>
-        <StackPanel Margin="20" Spacing="14">
+    <DockPanel>
+        <Button DockPanel.Dock="Bottom"
+                Content="Save" Command="{Binding SaveCommand}"
+                HorizontalAlignment="Right"
+                Background="#FF0078D4" Foreground="White"
+                Padding="16,8" Margin="20,8" />
+        <TabControl>
 
-            <!-- Save location -->
-            <TextBlock Text="Save Location" FontWeight="SemiBold" />
-            <Grid ColumnDefinitions="*,Auto">
-                <TextBox Grid.Column="0" Text="{Binding SavePath}"
-                         Watermark="/Users/you/Pictures/ShareX Mac" />
-                <Button Grid.Column="1" Content="Browse…"
-                        Command="{Binding BrowseCommand}"
-                        CommandParameter="{Binding $parent[Window]}"
-                        Margin="8,0,0,0" Padding="12,6" />
-            </Grid>
+            <!-- ── General ── -->
+            <TabItem Header="General">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="14">
 
-            <Separator />
+                        <TextBlock Text="Save Location" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBox Grid.Column="0" Text="{Binding SavePath}"
+                                     Watermark="/Users/you/Pictures/ShareX Mac" />
+                            <Button Grid.Column="1" Content="Browse…"
+                                    Command="{Binding BrowseCommand}"
+                                    CommandParameter="{Binding $parent[Window]}"
+                                    Margin="8,0,0,0" Padding="12,6" />
+                        </Grid>
 
-            <!-- Capture behavior -->
-            <TextBlock Text="After Capture" FontWeight="SemiBold" />
-            <CheckBox Content="Copy image to clipboard after capture"
-                      IsChecked="{Binding AutoCopyImage}" />
-            <CheckBox Content="Show post-capture toolbar"
-                      IsChecked="{Binding ShowPostCaptureToolbar}" />
-            <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Toolbar timeout (seconds):"
-                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                <NumericUpDown Grid.Column="1" Value="{Binding PostCaptureTimeoutSeconds}"
-                               Minimum="2" Maximum="60" Width="80" HorizontalAlignment="Left" />
-            </Grid>
+                        <Separator />
 
-            <Separator />
+                        <TextBlock Text="Post-Capture Toolbar" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="Timeout (seconds):"
+                                       VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <NumericUpDown Grid.Column="1" Value="{Binding PostCaptureTimeoutSeconds}"
+                                           Minimum="2" Maximum="60" Width="80" HorizontalAlignment="Left" />
+                        </Grid>
 
-            <!-- Upload -->
-            <TextBlock Text="Upload" FontWeight="SemiBold" />
-            <CheckBox Content="Auto-upload after capture"
-                      IsChecked="{Binding AutoUploadAfterCapture}" />
-            <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Destination:"
-                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBlock Grid.Column="1" Text="Imgur" VerticalAlignment="Center" />
-            </Grid>
-            <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Imgur Client ID:"
-                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBox Grid.Column="1" Text="{Binding ImgurClientId}"
-                         Watermark="Register free at api.imgur.com/oauth2/addclient" />
-            </Grid>
-            <TextBlock Text="Imgur anonymous upload requires a free Client ID (no login needed)."
-                       FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+                        <Separator />
 
-            <Separator />
+                        <TextBlock Text="Upload" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="Destination:"
+                                       VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <TextBlock Grid.Column="1" Text="Imgur" VerticalAlignment="Center" />
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="Imgur Client ID:"
+                                       VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <TextBox Grid.Column="1" Text="{Binding ImgurClientId}"
+                                     Watermark="Register free at api.imgur.com/oauth2/addclient" />
+                        </Grid>
+                        <TextBlock Text="Imgur anonymous upload requires a free Client ID (no login needed)."
+                                   FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
 
-            <!-- Hotkeys -->
-            <TextBlock Text="Hotkeys" FontWeight="SemiBold" />
-            <TextBlock Text="Click a field and press a key combo (e.g. Cmd+Shift+1). Clear to disable."
-                       FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+                        <Separator />
 
-            <Grid ColumnDefinitions="130,*,Auto">
-                <TextBlock Grid.Column="0" Text="Capture Region:"
-                           VerticalAlignment="Center" />
-                <TextBox Grid.Column="1" x:Name="CaptureRegionBox"
-                         Text="{Binding CaptureRegionHotkey}"
-                         Watermark="Not set" IsReadOnly="True"
-                         Cursor="Hand" />
-                <Button Grid.Column="2" Content="✕"
-                        Command="{Binding ClearCaptureRegionHotkeyCommand}"
-                        Margin="4,0,0,0" Padding="8,4" />
-            </Grid>
+                        <TextBlock Text="System" FontWeight="SemiBold" />
+                        <CheckBox Content="Launch at Login"
+                                  IsChecked="{Binding LaunchAtLogin}" />
 
-            <Grid ColumnDefinitions="130,*,Auto">
-                <TextBlock Grid.Column="0" Text="Capture Window:"
-                           VerticalAlignment="Center" />
-                <TextBox Grid.Column="1" x:Name="CaptureWindowBox"
-                         Text="{Binding CaptureWindowHotkey}"
-                         Watermark="Not set" IsReadOnly="True"
-                         Cursor="Hand" />
-                <Button Grid.Column="2" Content="✕"
-                        Command="{Binding ClearCaptureWindowHotkeyCommand}"
-                        Margin="4,0,0,0" Padding="8,4" />
-            </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-            <Grid ColumnDefinitions="130,*,Auto">
-                <TextBlock Grid.Column="0" Text="Capture Fullscreen:"
-                           VerticalAlignment="Center" />
-                <TextBox Grid.Column="1" x:Name="CaptureFullscreenBox"
-                         Text="{Binding CaptureFullscreenHotkey}"
-                         Watermark="Not set" IsReadOnly="True"
-                         Cursor="Hand" />
-                <Button Grid.Column="2" Content="✕"
-                        Command="{Binding ClearCaptureFullscreenHotkeyCommand}"
-                        Margin="4,0,0,0" Padding="8,4" />
-            </Grid>
+            <!-- ── Hotkeys ── -->
+            <TabItem Header="Hotkeys">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="14">
 
-            <Grid ColumnDefinitions="130,*,Auto">
-                <TextBlock Grid.Column="0" Text="Record Video:"
-                           VerticalAlignment="Center" />
-                <TextBox Grid.Column="1" x:Name="RecordVideoBox"
-                         Text="{Binding RecordVideoHotkey}"
-                         Watermark="Not set" IsReadOnly="True"
-                         Cursor="Hand" />
-                <Button Grid.Column="2" Content="✕"
-                        Command="{Binding ClearRecordVideoHotkeyCommand}"
-                        Margin="4,0,0,0" Padding="8,4" />
-            </Grid>
+                        <TextBlock Text="Hotkeys" FontWeight="SemiBold" />
+                        <TextBlock Text="Click a field and press a key combo (e.g. Cmd+Shift+1). Clear to disable."
+                                   FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
 
-            <Grid ColumnDefinitions="130,*,Auto">
-                <TextBlock Grid.Column="0" Text="Record GIF:"
-                           VerticalAlignment="Center" />
-                <TextBox Grid.Column="1" x:Name="RecordGifBox"
-                         Text="{Binding RecordGifHotkey}"
-                         Watermark="Not set" IsReadOnly="True"
-                         Cursor="Hand" />
-                <Button Grid.Column="2" Content="✕"
-                        Command="{Binding ClearRecordGifHotkeyCommand}"
-                        Margin="4,0,0,0" Padding="8,4" />
-            </Grid>
+                        <Grid ColumnDefinitions="130,*,Auto">
+                            <TextBlock Grid.Column="0" Text="Capture Region:"
+                                       VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" x:Name="CaptureRegionBox"
+                                     Text="{Binding CaptureRegionHotkey}"
+                                     Watermark="Not set" IsReadOnly="True" Cursor="Hand" />
+                            <Button Grid.Column="2" Content="✕"
+                                    Command="{Binding ClearCaptureRegionHotkeyCommand}"
+                                    Margin="4,0,0,0" Padding="8,4" />
+                        </Grid>
 
-            <Grid ColumnDefinitions="130,*,Auto">
-                <TextBlock Grid.Column="0" Text="Capture Text (OCR):"
-                           VerticalAlignment="Center" />
-                <TextBox Grid.Column="1" x:Name="OcrTextBox"
-                         Text="{Binding OcrTextHotkey}"
-                         Watermark="Not set" IsReadOnly="True"
-                         Cursor="Hand" />
-                <Button Grid.Column="2" Content="✕"
-                        Command="{Binding ClearOcrTextHotkeyCommand}"
-                        Margin="4,0,0,0" Padding="8,4" />
-            </Grid>
+                        <Grid ColumnDefinitions="130,*,Auto">
+                            <TextBlock Grid.Column="0" Text="Capture Window:"
+                                       VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" x:Name="CaptureWindowBox"
+                                     Text="{Binding CaptureWindowHotkey}"
+                                     Watermark="Not set" IsReadOnly="True" Cursor="Hand" />
+                            <Button Grid.Column="2" Content="✕"
+                                    Command="{Binding ClearCaptureWindowHotkeyCommand}"
+                                    Margin="4,0,0,0" Padding="8,4" />
+                        </Grid>
 
-            <Separator />
+                        <Grid ColumnDefinitions="130,*,Auto">
+                            <TextBlock Grid.Column="0" Text="Capture Fullscreen:"
+                                       VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" x:Name="CaptureFullscreenBox"
+                                     Text="{Binding CaptureFullscreenHotkey}"
+                                     Watermark="Not set" IsReadOnly="True" Cursor="Hand" />
+                            <Button Grid.Column="2" Content="✕"
+                                    Command="{Binding ClearCaptureFullscreenHotkeyCommand}"
+                                    Margin="4,0,0,0" Padding="8,4" />
+                        </Grid>
 
-            <!-- System -->
-            <TextBlock Text="System" FontWeight="SemiBold" />
-            <CheckBox Content="Launch at Login"
-                      IsChecked="{Binding LaunchAtLogin}" />
+                        <Grid ColumnDefinitions="130,*,Auto">
+                            <TextBlock Grid.Column="0" Text="Record Video:"
+                                       VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" x:Name="RecordVideoBox"
+                                     Text="{Binding RecordVideoHotkey}"
+                                     Watermark="Not set" IsReadOnly="True" Cursor="Hand" />
+                            <Button Grid.Column="2" Content="✕"
+                                    Command="{Binding ClearRecordVideoHotkeyCommand}"
+                                    Margin="4,0,0,0" Padding="8,4" />
+                        </Grid>
 
-            <Separator />
+                        <Grid ColumnDefinitions="130,*,Auto">
+                            <TextBlock Grid.Column="0" Text="Record GIF:"
+                                       VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" x:Name="RecordGifBox"
+                                     Text="{Binding RecordGifHotkey}"
+                                     Watermark="Not set" IsReadOnly="True" Cursor="Hand" />
+                            <Button Grid.Column="2" Content="✕"
+                                    Command="{Binding ClearRecordGifHotkeyCommand}"
+                                    Margin="4,0,0,0" Padding="8,4" />
+                        </Grid>
 
-            <Button Content="Save" Command="{Binding SaveCommand}"
-                    HorizontalAlignment="Right" Background="#FF0078D4"
-                    Foreground="White" Padding="16,8" />
-        </StackPanel>
-    </ScrollViewer>
+                        <Grid ColumnDefinitions="130,*,Auto">
+                            <TextBlock Grid.Column="0" Text="Capture Text (OCR):"
+                                       VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" x:Name="OcrTextBox"
+                                     Text="{Binding OcrTextHotkey}"
+                                     Watermark="Not set" IsReadOnly="True" Cursor="Hand" />
+                            <Button Grid.Column="2" Content="✕"
+                                    Command="{Binding ClearOcrTextHotkeyCommand}"
+                                    Margin="4,0,0,0" Padding="8,4" />
+                        </Grid>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ── Workflow ── -->
+            <TabItem Header="Workflow">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="10">
+
+                        <TextBlock Text="Configure what happens after each capture. Override defaults per capture type."
+                                   FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+
+                        <!-- Column headers -->
+                        <Grid ColumnDefinitions="110,65,65,70,*" Margin="0,4,0,0">
+                            <TextBlock Grid.Column="1" Text="Toolbar"
+                                       HorizontalAlignment="Center" FontSize="11" Foreground="#FF888888" />
+                            <TextBlock Grid.Column="2" Text="Copy"
+                                       HorizontalAlignment="Center" FontSize="11" Foreground="#FF888888" />
+                            <TextBlock Grid.Column="3" Text="Upload"
+                                       HorizontalAlignment="Center" FontSize="11" Foreground="#FF888888" />
+                            <TextBlock Grid.Column="4" Text="Save Folder"
+                                       FontSize="11" Foreground="#FF888888" />
+                        </Grid>
+
+                        <Separator />
+
+                        <!-- Defaults row (non-three-state checkboxes) -->
+                        <Grid ColumnDefinitions="110,65,65,70,*">
+                            <TextBlock Grid.Column="0" Text="Defaults"
+                                       FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <CheckBox Grid.Column="1" IsChecked="{Binding WfShowToolbar}"
+                                      HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="2" IsChecked="{Binding WfAutoCopyImage}"
+                                      HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="3" IsChecked="{Binding WfAutoUpload}"
+                                      HorizontalAlignment="Center" />
+                            <Grid Grid.Column="4" ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Text="{Binding WfSaveFolder}"
+                                         Watermark="Use default save path" />
+                                <Button Grid.Column="1" Content="…"
+                                        Command="{Binding BrowseWfSaveFolderCommand}"
+                                        CommandParameter="{Binding $parent[Window]}"
+                                        Margin="4,0,0,0" Padding="8,4" />
+                            </Grid>
+                        </Grid>
+
+                        <Separator />
+
+                        <!-- Region override row (three-state checkboxes) -->
+                        <Grid ColumnDefinitions="110,65,65,70,*">
+                            <TextBlock Grid.Column="0" Text="Region"
+                                       VerticalAlignment="Center" />
+                            <CheckBox Grid.Column="1" IsChecked="{Binding WfRegionShowToolbar}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="2" IsChecked="{Binding WfRegionAutoCopyImage}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="3" IsChecked="{Binding WfRegionAutoUpload}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <Grid Grid.Column="4" ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Text="{Binding WfRegionSaveFolder}"
+                                         Watermark="Inherit" />
+                                <Button Grid.Column="1" Content="…"
+                                        Command="{Binding BrowseWfRegionSaveFolderCommand}"
+                                        CommandParameter="{Binding $parent[Window]}"
+                                        Margin="4,0,0,0" Padding="8,4" />
+                            </Grid>
+                        </Grid>
+
+                        <!-- Window override row -->
+                        <Grid ColumnDefinitions="110,65,65,70,*">
+                            <TextBlock Grid.Column="0" Text="Window"
+                                       VerticalAlignment="Center" />
+                            <CheckBox Grid.Column="1" IsChecked="{Binding WfWindowShowToolbar}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="2" IsChecked="{Binding WfWindowAutoCopyImage}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="3" IsChecked="{Binding WfWindowAutoUpload}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <Grid Grid.Column="4" ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Text="{Binding WfWindowSaveFolder}"
+                                         Watermark="Inherit" />
+                                <Button Grid.Column="1" Content="…"
+                                        Command="{Binding BrowseWfWindowSaveFolderCommand}"
+                                        CommandParameter="{Binding $parent[Window]}"
+                                        Margin="4,0,0,0" Padding="8,4" />
+                            </Grid>
+                        </Grid>
+
+                        <!-- Fullscreen override row -->
+                        <Grid ColumnDefinitions="110,65,65,70,*">
+                            <TextBlock Grid.Column="0" Text="Fullscreen"
+                                       VerticalAlignment="Center" />
+                            <CheckBox Grid.Column="1" IsChecked="{Binding WfFullscreenShowToolbar}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="2" IsChecked="{Binding WfFullscreenAutoCopyImage}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <CheckBox Grid.Column="3" IsChecked="{Binding WfFullscreenAutoUpload}"
+                                      IsThreeState="True" HorizontalAlignment="Center" />
+                            <Grid Grid.Column="4" ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Text="{Binding WfFullscreenSaveFolder}"
+                                         Watermark="Inherit" />
+                                <Button Grid.Column="1" Content="…"
+                                        Command="{Binding BrowseWfFullscreenSaveFolderCommand}"
+                                        CommandParameter="{Binding $parent[Window]}"
+                                        Margin="4,0,0,0" Padding="8,4" />
+                            </Grid>
+                        </Grid>
+
+                        <TextBlock Text="Checked = force ON · Unchecked = force OFF · Indeterminate (−) = inherit default"
+                                   FontSize="11" Foreground="#FFAAAAAA" TextWrapping="Wrap"
+                                   Margin="0,6,0,0" />
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+    </DockPanel>
 </Window>

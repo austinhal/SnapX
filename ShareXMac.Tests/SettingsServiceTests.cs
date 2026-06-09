@@ -12,8 +12,7 @@ public class SettingsServiceTests
     {
         var s = new AppSettings();
         Assert.False(string.IsNullOrEmpty(s.SavePath));
-        Assert.True(s.AutoCopyImage);
-        Assert.True(s.ShowPostCaptureToolbar);
+        Assert.Equal(8, s.PostCaptureToolbarTimeoutSeconds);
     }
 
     [Fact]
@@ -24,12 +23,12 @@ public class SettingsServiceTests
         {
             var svc = new SettingsService(tempFile);
             svc.Current.SavePath = "/tmp/sharexmac-test";
-            svc.Current.AutoCopyImage = false;
+            svc.Current.ImgurClientId = "testclient";
             svc.Save();
 
             var svc2 = new SettingsService(tempFile);
             Assert.Equal("/tmp/sharexmac-test", svc2.Current.SavePath);
-            Assert.False(svc2.Current.AutoCopyImage);
+            Assert.Equal("testclient", svc2.Current.ImgurClientId);
         }
         finally
         {
@@ -51,7 +50,6 @@ public class SettingsServiceTests
         var s = new AppSettings();
         Assert.Equal("", s.ImgurClientId);
         Assert.Equal(ImageDestination.Imgur, s.ActiveImageDestination);
-        Assert.False(s.AutoUploadAfterCapture);
     }
 
     [Fact]
