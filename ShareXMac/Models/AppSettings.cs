@@ -18,4 +18,7 @@ public class AppSettings
 
     // Hotkeys
     public HotkeySettings Hotkeys { get; set; } = new HotkeySettings();
+
+    // Workflow
+    public WorkflowSettings Workflow { get; set; } = new WorkflowSettings();
 }

@@ -73,21 +73,21 @@ public partial class TrayViewModel : ObservableObject
     private async Task CaptureRegion()
     {
         byte[]? data = await _capture.CaptureRegionAsync();
-        if (data != null) await OnCaptureComplete(data);
+        if (data != null) await OnCaptureComplete(data, CaptureType.Region);
     }
 
     [RelayCommand]
     private async Task CaptureWindow()
     {
         byte[]? data = await _capture.CaptureWindowAsync();
-        if (data != null) await OnCaptureComplete(data);
+        if (data != null) await OnCaptureComplete(data, CaptureType.Window);
     }
 
     [RelayCommand]
     private async Task CaptureFullscreen()
     {
         byte[]? data = await _capture.CaptureFullscreenAsync();
-        if (data != null) await OnCaptureComplete(data);
+        if (data != null) await OnCaptureComplete(data, CaptureType.Fullscreen);
     }
 
     [RelayCommand]
@@ -191,15 +191,17 @@ public partial class TrayViewModel : ObservableObject
             app.Shutdown();
     }
 
-    private async Task OnCaptureComplete(byte[] data)
+    private async Task OnCaptureComplete(byte[] data, CaptureType captureType)
     {
-        string dir = _settings.Current.SavePath;
+        var wf = _settings.Current.Workflow.Resolve(captureType);
+
+        string dir = wf.SaveFolder ?? _settings.Current.SavePath;
         Directory.CreateDirectory(dir);
         string path = Path.Combine(dir, $"ShareX-{DateTime.Now:yyyy-MM-dd-HHmmss}.png");
         await File.WriteAllBytesAsync(path, data);
 
         string? url = null;
-        if (_settings.Current.AutoUploadAfterCapture)
+        if (wf.AutoUpload)
         {
             url = await _upload.UploadImageAsync(data, Path.GetFileName(path), _settings.Current);
             if (url != null)
@@ -208,16 +210,15 @@ public partial class TrayViewModel : ObservableObject
 
         _history.AddCapture(path, url);
 
-        // Clipboard (image or path) — only if we didn't already set a URL
         if (url == null)
         {
-            if (_settings.Current.AutoCopyImage)
+            if (wf.AutoCopyImage)
                 MacClipboard.SetImage(data);
             else
                 MacClipboard.SetText(path);
         }
 
-        if (_settings.Current.ShowPostCaptureToolbar)
+        if (wf.ShowToolbar)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
